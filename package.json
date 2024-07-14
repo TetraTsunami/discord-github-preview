@@ -1,13 +1,17 @@
 {
+  "name": "discord-preview",
+  "description": "",
+  "version": "1.0.0",
+  "main": "src/server.ts",
   "dependencies": {
     "apicache": "^1.6.3",
     "discord.js": "^14.15.3",
     "dotenv": "^16.0.1",
     "express": "^4.19.2",
     "millify": "^4.0.0",
-    "node-base64-image": "^2.0.1"
+    "node-base64-image": "^2.0.1",
+    "tsconfig-paths": "^4.2.0"
   },
-  "description": "",
   "devDependencies": {
     "@eslint/js": "^9.6.0",
     "@markdoc/markdoc": "^0.1.3",
@@ -27,8 +31,6 @@
     "typescript-eslint": "^7.15.0"
   },
   "license": "ISC",
-  "main": "src/server.ts",
-  "name": "discord-preview",
   "scripts": {
     "build": "tsc --build --clean && tsc",
     "dev": "nodemon ./src/server.ts",
@@ -36,5 +38,18 @@
     "lint": "eslint . --ext .ts",
     "test": "jest"
   },
-  "version": "1.0.0"
+  "nodemonConfig": {
+    "ignore":
+      [
+        "**/*.test.ts",
+        "**/*.spec.ts",
+        ".git",
+        "node_modules"
+      ],
+    "watch": [
+      "src"
+    ],
+    "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/server.ts",
+    "ext": "ts, js"
+  }
 }

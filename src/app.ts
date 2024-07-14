@@ -1,9 +1,10 @@
 import express from "express";
-import { discordUser } from "./api";
+import { discordSelf, discordUser } from "@/api";
 import 'dotenv/config';
 
 const app = express();
 
-app.get("/api", discordUser);
+app.get("/api", discordSelf);
+app.get("/api/user/:id", discordUser);
 
 export default app;
