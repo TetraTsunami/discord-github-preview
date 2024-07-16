@@ -1,6 +1,6 @@
 import readyClient from "@/bot";
 import { makeCard } from "@/helpers/card";
-import { validateId, fetchUserInfo, demoUser } from "@/helpers/discord";
+import { validateId, fetchUserInfo } from "@/helpers/discord";
 import type { RequestHandler } from "express";
 
 export const discordSelf: RequestHandler = async (req, res, next) => {
@@ -16,10 +16,10 @@ export const discordUser: RequestHandler = async (req, res, next) => {
     return;
   }
   try {
-    // const user = await fetchUserInfo(client, id);
-    const user = demoUser;
+    const user = await fetchUserInfo(client, id);
     if (!user) {
       res.status(404).send("User not found");
+      return;
     }
     const card = makeCard(user);
     res.status(200).send(card);
