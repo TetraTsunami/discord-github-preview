@@ -22,7 +22,9 @@ export const discordUser: RequestHandler = async (req, res, next) => {
       return;
     }
     const card = makeCard(user);
-    res.status(200).send(card);
+    res.set('Content-Type', 'image/svg+xml')
+      .status(200)
+      .send(card);
   } catch (error) {
     next(error);
   }

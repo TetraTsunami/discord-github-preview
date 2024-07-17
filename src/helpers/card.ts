@@ -1,4 +1,5 @@
 import { UserProperties } from "@/helpers/discord";
+import { Activity } from "discord.js";
 
 const colors = {
   background: "#313338",
@@ -12,19 +13,59 @@ const statusColors = {
   offline: "#747f8d"
 }
 
-export const makeCard = (user: UserProperties) => {
-  let statusString = ((user.presence?.status && statusColors.hasOwnProperty(user.presence.status)) ? user.presence.status : "online") as keyof typeof statusColors;
-  
-  return `
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 700 375" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+interface CustomStatus extends Activity {
+  type: 4;
+}
 
-<--! Banner & card background -->
+const isCustomStatus = (activity: Activity): activity is CustomStatus => {
+  return activity.type === 4;
+}
+
+const customStatus = (activity: CustomStatus, y: Number) => {
+  const emojiUrl = activity.emoji?.url;
+}
+
+export const makeCard = (user: UserProperties) => {
+  const statusString = ((user.presence?.status && statusColors.hasOwnProperty(user.presence.status)) ? user.presence.status : "online") as keyof typeof statusColors;
+  /* Activity types:
+  1. Custom status (with custom emojis?)
+  2. Current activity (game, can be up to 4 lines I think)
+  */
+ /*
+ activities: [
+    Activity {
+      name: 'Custom Status',
+      type: 4,
+      url: null,
+      details: null,
+      state: 'they might be goats',
+      applicationId: null,
+      timestamps: [Object],
+      party: null,
+      syncId: null,
+      assets: null,
+      flags: [ActivityFlagsBitField],
+      emoji: null,
+      emoji: Emoji { animated: null, name: '🐐', id: null },
+      emoji: Emoji { animated: false, name: 'goated', id: '901527894315139082' }.imageUrl({size: 128}),
+      buttons: [],
+      createdTimestamp: 1721251487348
+    }
+  */
+//  console.log(user.presence?.activities);
+ const activities = user.presence?.activities;
+ const height = 210 + (activities?.length || 0) * 60;
+
+  
+  return Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 700 ${height}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+
+<!-- Banner & card background -->
 <g>
-  <rect x="0" y="0" width="700" height="375" rx="10" style="fill:${colors.background};"/>
+  <rect x="0" y="0" width="700" height="${height}" rx="10" style="fill:${colors.background};"/>
   <clipPath id="background">
-    <rect x="0" y="0" width="700" height="375" rx="10" />
+    <rect x="0" y="0" width="700" height="${height}" rx="10" />
   </clipPath>
   <g clip-path="url(#background)">
     <g>
@@ -33,13 +74,13 @@ export const makeCard = (user: UserProperties) => {
         <rect x="0" y="0" width="700" height="112.5"/>
       </clipPath>
       <g clip-path="url(#banner)">
-        <image xlink:href="${user.bannerURL}" height="112.5" width="700" />
+        <image xlink:href="${user.bannerURL}" height="112.5" width="700" preserveAspectRatio="xMidYMid slice" />
       </g>
     </g>
   </g>
 </g>
 
-<--! Avatar -->
+<!-- Avatar -->
 <g>
   <circle cx="100" cy="115" r="93" style="fill:${colors.background};"/>
   <clipPath id="avatar">
@@ -50,7 +91,7 @@ export const makeCard = (user: UserProperties) => {
   </g>
 </g>
 
-<--! Status -->
+<!-- Status -->
 <g>
   <mask id="status-online" maskContentUnits="objectBoundingBox" viewBox="0 0 1 1">
     <circle fill="white" cx="0.5" cy="0.5" r="0.5"></circle>
@@ -74,13 +115,8 @@ export const makeCard = (user: UserProperties) => {
   <rect x="140" y="145" width="40" height="40" style="fill:${statusColors[statusString]}; mask:url('#status-${statusString}');"/>
 </g>
 
-<--! Display Name -->
-<text style="fill: ${colors.text}; font-family: 'Open Sans'; font-size: 44px; font-weight: 700; white-space: pre;" x="207.93" y="164.891">${user.displayName}</text>
-<text style="fill: ${colors.lightText}; font-family: 'Open Sans'; font-size: 22px; white-space: pre;" x="207.93" y="190">${user.username}</text>
-
-<defs>
-  <style bx:fonts="Open Sans">@import url(https://fonts.googleapis.com/css2?family=Open+Sans%3Aital%2Cwght%400%2C300..800%3B1%2C300..800&amp;display=swap);</style>
-</defs>
-</svg>
-  `;
+<!-- Display Name -->
+<text style="fill: ${colors.text}; font-family:Tahoma,Verdana,sans-serif; font-size: 44px; font-weight: 700; white-space: pre;" x="208" y="165">${user.displayName}</text>
+<text style="fill: ${colors.lightText}; font-family:Tahoma,Verdana,sans-serif; font-size: 22px; white-space: pre;" x="208" y="190">${user.username}</text>
+</svg>`, 'binary');
 }
