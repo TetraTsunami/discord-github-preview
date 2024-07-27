@@ -21,7 +21,7 @@ export const discordUser: RequestHandler = async (req, res, next) => {
       res.status(404).send("User not found");
       return;
     }
-    const card = makeCard(user);
+    const card = await makeCard(user);
     res.set('Content-Type', 'image/svg+xml')
       .status(200)
       .send(card);

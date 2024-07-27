@@ -1,10 +1,12 @@
 import { UserProperties } from "@/helpers/discord";
 import { Activity } from "discord.js";
+import { mediaURLtoBase64, prettyDuration } from "./utils";
 
 const colors = {
   background: "#313338",
   text: "#fff",
-  lightText: "#72767d"
+  secondaryText: "#b9bbbe",
+  tertiaryText: "#72767d"
 };
 const statusColors = {
   online: "#43b581",
@@ -21,51 +23,77 @@ const isCustomStatus = (activity: Activity): activity is CustomStatus => {
   return activity.type === 4;
 }
 
-const customStatus = (activity: CustomStatus, y: Number) => {
-  const emojiUrl = activity.emoji?.url;
+const customStatusSVG = async (activity: CustomStatus, y: number): Promise<string> => {
+  const hasEmojiURL = activity.emoji !== null && activity.emoji.id !== null;
+  const emojiUrl = hasEmojiURL && activity.emoji?.imageURL({size: 64})
+  const emojiName = activity.emoji?.name;
+
+  return `<g>
+  <rect x="200" y="${y}" width="500" height="60" style="fill:${colors.background};"/>
+  ${hasEmojiURL ? 
+    `<image xlink:href="${await mediaURLtoBase64(emojiUrl as string)}" x="20" y="${y + 2}" height="34" width="34" />` :
+    `<text style="fill: ${colors.text}; font-family:Tahoma,Verdana,sans-serif; font-size: 30px;" x="20" y="${y + 30}">${emojiName}</text>`}
+  <foreignObject x="60" y="${y + 6}" width="630" height="60">
+    <p xmlns="http://www.w3.org/1999/xhtml" 
+    style="color: ${colors.secondaryText}; margin: 0; font-family:Tahoma,Verdana,sans-serif; font-size: 22px; font-style: italic; line-height: 1.2em;">
+    ${activity.state}</p>
+  </foreignObject>
+</g>`;
 }
 
-export const makeCard = (user: UserProperties) => {
+// All other activities ought to be parsable as a generic activity with space for Rich Presence assets
+const activitySVG = async (activity: Activity, y: number): Promise<string> => {
+  const largeImage = mediaURLtoBase64(activity.assets?.largeImageURL({ size: 128, extension: "webp" }) || "");
+  const smallImage = mediaURLtoBase64(activity.assets?.smallImageURL({ size: 32, extension: "webp" }) || "");
+  const timestamps = activity.timestamps;
+  // 4 flavors: nothing (don't show), start only (hh:mm elapsed), end only (hh:mm remaining), both (hh:mm elapsed - hh:mm remaining)
+  const timeElapsed = timestamps?.start ? prettyDuration(Date.now() - timestamps.start.getTime()) : "";
+  const timeRemaining = timestamps?.end ? prettyDuration(timestamps.end.getTime() - Date.now()) : "";
+  const timeString = timeElapsed && timeRemaining ? 
+    `${timeElapsed} elapsed - ${timeRemaining} remaining` :
+    timeElapsed ? `${timeElapsed} elapsed` :
+    timeRemaining ? `${timeRemaining} remaining` : "";
+
+  return `<g>
+  <rect x="200" y="${y}" width="500" height="60" style="fill:${colors.background};"/>
+  <text style="fill: ${colors.secondaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 30px;" x="208" y="${y + 40}">${activity.name}</text>
+  <text style="fill: ${colors.tertiaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 20px;" x="208" y="${y + 76}">${activity.details}</text>
+  <text style="fill: ${colors.tertiaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 20px;" x="208" y="${y + 106}">${activity.state}</text>
+  ${timeString && `<text style="fill: ${colors.tertiaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 20px;" x="208" y="${y + 136}">${timeString}</text>`}
+  ${largeImage && `<image xlink:href="${await largeImage}" x="24" y="${y}" height="160" width="160" />`}
+  ${smallImage && `<image xlink:href="${await smallImage}" x="144" y="${y + 120}" height="40" width="40" />`}
+</g>`;
+}
+
+export const makeCard = async (user: UserProperties) => {
   const statusString = ((user.presence?.status && statusColors.hasOwnProperty(user.presence.status)) ? user.presence.status : "online") as keyof typeof statusColors;
   /* Activity types:
   1. Custom status (with custom emojis?)
   2. Current activity (game, can be up to 4 lines I think)
   */
- /*
- activities: [
-    Activity {
-      name: 'Custom Status',
-      type: 4,
-      url: null,
-      details: null,
-      state: 'they might be goats',
-      applicationId: null,
-      timestamps: [Object],
-      party: null,
-      syncId: null,
-      assets: null,
-      flags: [ActivityFlagsBitField],
-      emoji: null,
-      emoji: Emoji { animated: null, name: '🐐', id: null },
-      emoji: Emoji { animated: false, name: 'goated', id: '901527894315139082' }.imageUrl({size: 128}),
-      buttons: [],
-      createdTimestamp: 1721251487348
-    }
-  */
-//  console.log(user.presence?.activities);
- const activities = user.presence?.activities;
- const height = 210 + (activities?.length || 0) * 60;
+  const activities = user.presence?.activities || [];
+  // Height = 210 (user info, banner) + the height of all the activities, which varies based on the type of activity
+  const userHeight = 210;
+  const activityHeights = activities?.map(activity => isCustomStatus(activity) ? 80 : 160) || [];
+  const totalHeight = userHeight + (activityHeights.reduce((acc, curr) => acc + curr, 0)) + 20; // 10px padding at the bottom
 
-  
-  return Buffer.from(`<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  // Generate promises all at once so they can be awaited in parallel (activities need promises for their images)
+  const activityPromises: Promise<string>[] = []
+  for (let i = 0; i < activities.length; i++) {
+    const activity = activities[i];
+    const y = userHeight + (activityHeights.slice(0, i).reduce((acc, curr) => acc + curr, 0));
+    activityPromises.push(isCustomStatus(activity) ? customStatusSVG(activity, y) : activitySVG(activity, y));
+  }
+
+  return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 700 ${height}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+<svg width="100%" height="100%" viewBox="0 0 700 ${totalHeight}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
 
 <!-- Banner & card background -->
 <g>
-  <rect x="0" y="0" width="700" height="${height}" rx="10" style="fill:${colors.background};"/>
+  <rect x="0" y="0" width="700" height="${totalHeight}" rx="10" style="fill:${colors.background};"/>
   <clipPath id="background">
-    <rect x="0" y="0" width="700" height="${height}" rx="10" />
+    <rect x="0" y="0" width="700" height="${totalHeight}" rx="10" />
   </clipPath>
   <g clip-path="url(#background)">
     <g>
@@ -74,7 +102,9 @@ export const makeCard = (user: UserProperties) => {
         <rect x="0" y="0" width="700" height="112.5"/>
       </clipPath>
       <g clip-path="url(#banner)">
-        <image xlink:href="${user.bannerURL}" height="112.5" width="700" preserveAspectRatio="xMidYMid slice" />
+        ${user.bannerURL &&
+          `<image xlink:href="${await user.bannerURL}" height="112.5" width="700" preserveAspectRatio="xMidYMid slice" />`
+        }
       </g>
     </g>
   </g>
@@ -87,7 +117,7 @@ export const makeCard = (user: UserProperties) => {
     <circle cx="100" cy="115" r="83"/>
   </clipPath>
   <g clip-path="url(#avatar)">
-    <image xlink:href="${user.avatarURL}" x="17" y="32" height="166" width="166" />
+    <image xlink:href="${await user.avatarURL}" x="17" y="32" height="166" width="166" />
   </g>
 </g>
 
@@ -117,6 +147,9 @@ export const makeCard = (user: UserProperties) => {
 
 <!-- Display Name -->
 <text style="fill: ${colors.text}; font-family:Tahoma,Verdana,sans-serif; font-size: 44px; font-weight: 700; white-space: pre;" x="208" y="165">${user.displayName}</text>
-<text style="fill: ${colors.lightText}; font-family:Tahoma,Verdana,sans-serif; font-size: 22px; white-space: pre;" x="208" y="190">${user.username}</text>
-</svg>`, 'binary');
+<text style="fill: ${colors.tertiaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 22px; white-space: pre;" x="208" y="190">${user.username}</text>
+
+<!-- Activities, if any -->
+${await Promise.all(activityPromises)}
+</svg>`;
 }
