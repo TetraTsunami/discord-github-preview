@@ -1,6 +1,6 @@
-import readyClient from "@/bot";
-import { makeCard } from "@/helpers/card";
-import { validateId, fetchUserInfo } from "@/helpers/discord";
+import readyClient from "../bot";
+import { makeCard } from "../helpers/card";
+import { validateId, fetchUserInfo } from "../helpers/discord";
 import type { RequestHandler } from "express";
 
 export const discordSelf: RequestHandler = async (req, res, next) => {

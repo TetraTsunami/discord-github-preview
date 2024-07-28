@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "@/app";
+import app from "../src/app";
 
 describe("Test /api/user/:id", () => {
   test("It should respond with an error for invalid ID", () => {

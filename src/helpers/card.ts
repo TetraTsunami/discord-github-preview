@@ -1,4 +1,4 @@
-import { UserProperties } from "@/helpers/discord";
+import { UserProperties } from "./discord";
 import { Activity } from "discord.js";
 import { mediaURLtoBase64, prettyDuration } from "./utils";
 
