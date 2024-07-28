@@ -1,0 +1,32 @@
+# Discord Profile Previews
+
+Generates an SVG representing your current activity state in Discord. You can embed this SVG most anywhere external images are allowed, like your personal website, a GitHub README, or a forum!
+
+Right now, it'll display:
+- Profile photo, avatar decorations, and banner
+- Online, idle, DND, and offline states
+- Display name and username
+- Current activity and custom status
+
+## Screenshots
+
+<p align="center">
+  <img width="400" src="https://github.com/user-attachments/assets/ff9e2dcd-f508-4cc3-8d52-8ecfe5ec53bb"></img>  
+  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
+
+  A screenshot and actual instance of the program, side-by-side (in case I'm offline or doing something boring)
+  
+</p>
+
+## How do I get this set up?
+
+The simplest way is by using my hosted instance. 
+
+1. You need to be in the same server as the bot for it to work, so you should [join my Discord server](https://discord.gg/W59fcbydeG)
+2. Right-click on the server icon and navigate to "Privacy settings". Make sure your "activity privacy" is set to ON for the server or else the bot won't be able to see your game activity, just your custom status.
+If you DON'T WANT the bot to display your game activity, then you can turn activity privacy OFF instead.
+3. Find your Discord User ID-- it's a number that looks like 214167454291722241. You can find this by turning on User Settings > Advanced > Developer Mode, then clicking on your profile picture in the
+bottom corner of the Discord client and pressing "Copy User ID"
+5. Paste `<img width="400" src="https://dsc-readme.tsuni.dev/api/user/<YOUR DISCORD USER ID>"></img>` into your GitHub README.md, replacing \<YOUR DISCORD USER ID\> with the ID you copied last step.
+You can adjust the width here as well, but the images in the card won't look very good past 500px.
+6. If you want the profile to be centered, you can surround the `<img>` tags with `<p align="center">` and `</p>`
