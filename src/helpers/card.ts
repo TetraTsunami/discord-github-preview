@@ -41,10 +41,17 @@ const customStatusSVG = async (activity: CustomStatus, y: number): Promise<strin
 </g>`;
 }
 
+const isTallActivity = (activity: Activity) => {
+  return Boolean(activity.assets?.largeImage);
+}
+
 // All other activities ought to be parsable as a generic activity with space for Rich Presence assets
 const activitySVG = async (activity: Activity, y: number): Promise<string> => {
-  const largeImage = mediaURLtoBase64(activity.assets?.largeImageURL({ size: 128, extension: "webp" }) || "");
-  const smallImage = mediaURLtoBase64(activity.assets?.smallImageURL({ size: 32, extension: "webp" }) || "");
+  // Get image URLs, then convert them to base64. URLs are stored separately to check that they exist before converting
+  const largeImageURL = activity.assets?.largeImageURL({ size: 128, extension: "webp" });
+  const smallImageURL = activity.assets?.smallImageURL({ size: 32, extension: "webp" });
+  const largeImage = largeImageURL && mediaURLtoBase64(largeImageURL);
+  const smallImage = smallImageURL && mediaURLtoBase64(smallImageURL);
   const timestamps = activity.timestamps;
   // 4 flavors: nothing (don't show), start only (hh:mm elapsed), end only (hh:mm remaining), both (hh:mm elapsed - hh:mm remaining)
   const timeElapsed = timestamps?.start ? prettyDuration(Date.now() - timestamps.start.getTime()) : "";
@@ -53,15 +60,19 @@ const activitySVG = async (activity: Activity, y: number): Promise<string> => {
     `${timeElapsed} elapsed - ${timeRemaining} remaining` :
     timeElapsed ? `${timeElapsed} elapsed` :
     timeRemaining ? `${timeRemaining} remaining` : "";
-
+  const detailLines = [activity.details, activity.state, timeString].filter(Boolean);
+  // Placeholder used when big image is missing. It's a question mark that's 80px by 80px, so we'll have to move the text to account
+  const placeholderImg = `<path transform='translate(24 ${y}) scale(0.15625)' fill="${colors.text}" d="M384 32H64C28.654 32 0 60.654 0 96V416C0 451.346 28.654 480 64 480H384C419.346 480 448 451.346 448 416V96C448 60.654 419.346 32 384 32ZM224 400C206 400 192 386 192 368S206 336 224 336C242 336 256 350 256 368S242 400 224 400ZM294 258L248 286V288C248 301 237 312 224 312S200 301 200 288V272C200 264 204 256 212 251L269 217C276 213 280 206 280 198C280 186 270 176 258 176H206C194 176 184 186 184 198C184 211 173 222 160 222S136 211 136 198C136 159 167 128 206 128H258C297 128 328 159 328 198C328 222 315 245 294 258Z"/>`
+  const textY = largeImage ? y + 40 : y + 35;
+  const textX = largeImage ? 208 : 128;
+  // Final SVG bits
   return `<g>
   <rect x="200" y="${y}" width="500" height="60" style="fill:${colors.background};"/>
-  <text style="fill: ${colors.secondaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 30px;" x="208" y="${y + 40}">${activity.name}</text>
-  <text style="fill: ${colors.tertiaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 20px;" x="208" y="${y + 76}">${activity.details}</text>
-  <text style="fill: ${colors.tertiaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 20px;" x="208" y="${y + 106}">${activity.state}</text>
-  ${timeString && `<text style="fill: ${colors.tertiaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 20px;" x="208" y="${y + 136}">${timeString}</text>`}
-  ${largeImage && `<image xlink:href="${await largeImage}" x="24" y="${y}" height="160" width="160" />`}
-  ${smallImage && `<image xlink:href="${await smallImage}" x="144" y="${y + 120}" height="40" width="40" />`}
+  <text style="fill: ${colors.secondaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 30px;" x="${textX}" y="${textY}">${activity.name}</text>
+  ${detailLines.map((line, i) => `<text style="fill: ${colors.tertiaryText}; font-family:Tahoma,Verdana,sans-serif; font-size: 20px;" x="${textX}" y="${textY + 36 + (i * 30)}">${line}</text>`).join("")}
+  ${largeImage ? `<image xlink:href="${await largeImage}" x="24" y="${y}" height="160" width="160" clip-path="inset(0% round 15px)" />` : placeholderImg}
+  ${smallImage && `<rect x="132" y="${y + 108}" width="58" height="58" rx="17px" ry="17px" style="fill:${colors.background};"/>
+    <image xlink:href="${await smallImage}" x="136" y="${y + 112}" height="50" width="50" clip-path="inset(0% round 15px)" />`}
 </g>`;
 }
 
@@ -74,7 +85,9 @@ export const makeCard = async (user: UserProperties) => {
   const activities = user.presence?.activities || [];
   // Height = 210 (user info, banner) + the height of all the activities, which varies based on the type of activity
   const userHeight = 210;
-  const activityHeights = activities?.map(activity => isCustomStatus(activity) ? 80 : 160) || [];
+  const activityHeights = activities?.map(activity => isCustomStatus(activity) ? 80 : 
+                                        isTallActivity(activity) ? 160 :
+                                        100 ) || [];
   const totalHeight = userHeight + (activityHeights.reduce((acc, curr) => acc + curr, 0)) + 20; // 10px padding at the bottom
 
   // Generate promises all at once so they can be awaited in parallel (activities need promises for their images)
