@@ -1,12 +1,20 @@
-# Discord Profile Previews
+# Discord GitHub Preview
+"We heard you liked profiles, so we put a profile in your profile so you can be online while you're online"
 
-Generates an SVG representing your current activity state in Discord. You can embed this SVG most anywhere external images are allowed, like your personal website, a GitHub README, or a forum!
+Generates an SVG representing your current activity state in Discord. You can embed this SVG most anywhere external images are allowed, like your personal website or a GitHub README!
 
 Right now, it'll display:
 - Profile photo, avatar decorations, and banner
 - Online, idle, DND, and offline states
 - Display name and username
 - Current activity and custom status
+
+Potential future features:
+- Color themes and other configuration
+- Nitro profile colors (get in touch with me if you can help test this!)
+- Animated profile decorations (see above)
+- About Me and connected accounts (does anyone actually want these?)
+
 
 ## Screenshots
 
