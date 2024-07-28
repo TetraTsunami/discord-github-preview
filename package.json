@@ -23,6 +23,7 @@
     "prettier": "^3.3.2",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.5",
+    "ts-node": "^10.9.2",
     "typescript": "~5.4.0",
     "typescript-eslint": "^7.15.0"
   },
@@ -44,7 +45,6 @@
     "watch": [
       "src"
     ],
-    "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/server.ts",
     "ext": "ts, js"
   }
 }
