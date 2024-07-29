@@ -83,13 +83,13 @@ export const makeCard = async (user: UserProperties) => {
   2. Current activity (game, can be up to 4 lines I think)
   */
   const activities = user.presence?.activities || [];
+  console.log(activities);
   // Height = 210 (user info, banner) + the height of all the activities, which varies based on the type of activity
-  const userHeight = 210;
+  const userHeight = 220;
   const activityHeights = activities?.map(activity => isCustomStatus(activity) ? 80 : 
-                                        isTallActivity(activity) ? 160 :
-                                        100 ) || [];
-  const totalHeight = userHeight + (activityHeights.reduce((acc, curr) => acc + curr, 0)) + 20; // 10px padding at the bottom
-
+                                        isTallActivity(activity) ? 170 :
+                                        90 ) || [];
+  const totalHeight = userHeight + (activityHeights.reduce((acc, curr) => acc + curr, 0)) + 10; // 10px padding at the bottom
   // Generate promises all at once so they can be awaited in parallel (activities need promises for their images)
   const activityPromises: Promise<string>[] = []
   for (let i = 0; i < activities.length; i++) {
