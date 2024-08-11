@@ -24,16 +24,20 @@ const isCustomStatus = (activity: Activity): activity is CustomStatus => {
 }
 
 const customStatusSVG = async (activity: CustomStatus, y: number): Promise<string> => {
-  const hasEmojiURL = activity.emoji !== null && activity.emoji.id !== null;
-  const emojiUrl = hasEmojiURL && activity.emoji?.imageURL({size: 64})
+  const hasEmoji = activity.emoji !== null;
+  const xOffset = hasEmoji ? 60 : 20;
+  const hasCustomEmoji = activity.emoji !== null && activity.emoji.id !== null;
+  const emojiUrl = hasCustomEmoji && activity.emoji?.imageURL({size: 64})
   const emojiName = activity.emoji?.name;
 
   return `<g>
   <rect x="200" y="${y}" width="500" height="60" style="fill:${colors.background};"/>
-  ${hasEmojiURL ? 
+  ${hasCustomEmoji ? 
     `<image xlink:href="${await mediaURLtoBase64(emojiUrl as string)}" x="20" y="${y + 2}" height="34" width="34" />` :
-    `<text style="fill: ${colors.text}; font-family:Tahoma,Verdana,sans-serif; font-size: 30px;" x="20" y="${y + 30}">${emojiName}</text>`}
-  <foreignObject x="60" y="${y + 6}" width="630" height="60">
+  hasEmoji ?
+    `<text style="fill: ${colors.text}; font-family:Tahoma,Verdana,sans-serif; font-size: 30px;" x="20" y="${y + 30}">${emojiName}</text>`
+  : ""}
+  <foreignObject x="${xOffset}" y="${y + 6}" width="630" height="60">
     <p xmlns="http://www.w3.org/1999/xhtml" 
     style="color: ${colors.secondaryText}; margin: 0; font-family:Tahoma,Verdana,sans-serif; font-size: 22px; font-style: italic; line-height: 1.2em;">
     ${activity.state}</p>
