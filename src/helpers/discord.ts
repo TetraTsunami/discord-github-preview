@@ -16,9 +16,9 @@ export const validateId = (id: string) => {
   return id.match(/^[0-9]{17,19}$/);
 }
 
-export async function fetchUserInfo(client: Client<true>, id: string) {
+export async function fetchUserInfo(client: Client<true>, userID: string) {
   const guildID = process.env.DISCORD_GUILD_ID as string;
-  const member = await client.guilds.cache.get(guildID)?.members.fetch({ user: id, force: true });
+  const member = await client.guilds.cache.get(guildID)?.members.fetch({ user: userID, force: true });
   if (!member) {
     return null;
   }
@@ -37,4 +37,17 @@ export async function fetchUserInfo(client: Client<true>, id: string) {
     presence: member.presence,
   }
   return userProperties;
+}
+
+export async function fetchAppIconURL(appID: string) {
+  const appRPC = await fetch(`https://discord.com/api/v10/applications/${appID}/rpc`).then((res) => {
+    if (!res.ok) {
+      return null;
+    }
+    return res.json();
+  })
+  if (!appRPC) {
+    return null;
+  }
+  return `https://cdn.discordapp.com/app-icons/${appID}/${appRPC.icon}.webp`;
 }
