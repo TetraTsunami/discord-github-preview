@@ -23,14 +23,14 @@
     "prettier": "^3.3.2",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.5",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
     "typescript": "~5.4.0",
     "typescript-eslint": "^7.15.0"
   },
   "license": "ISC",
   "scripts": {
     "build": "tsc --build --clean && tsc",
-    "dev": "nodemon ./src/server.ts",
+    "dev": "nodemon  --exec tsx ./src/server.ts",
     "start": "node ./dist/src/server.js",
     "lint": "eslint . --ext .ts",
     "test": "jest"
