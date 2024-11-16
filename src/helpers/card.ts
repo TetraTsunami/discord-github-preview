@@ -110,7 +110,6 @@ export const makeCard = async (user: UserProperties) => {
   2. Current activity (game, can be up to 4 lines I think)
   */
   const activities = user.presence?.activities || [];
-  console.log(activities); // TODO: remove
   // Height = 210 (user info, banner) + the height of all the activities, which varies based on the type of activity
   const userHeight = 220;
   const activityHeights = activities?.map(activity => isCustomStatus(activity) ? 80 : 
