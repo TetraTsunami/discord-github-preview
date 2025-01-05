@@ -1,3 +1,5 @@
+import fs from "fs/promises";
+
 export const pngURLtoBase64 = async (url: string) => {
   return fetch(url)
     .then(res => res.arrayBuffer())
@@ -11,24 +13,29 @@ export const jpgURLtoBase64 = async (url: string) => {
 }
 
 export const URLtoBase64 = async (url: string, dataType: string) => {
-  return fetch(url)
-    .then(res => res.arrayBuffer())
-    .then(buffer => `data:${dataType};base64,${Buffer.from(buffer).toString("base64")}`);
+  if (url.startsWith('.')) {
+    const buffer = await fs.readFile(url);
+    return `data:${dataType};base64,${buffer.toString('base64')}`;
+  } else {
+    return fetch(url)
+      .then(res => res.arrayBuffer())
+      .then(buffer => `data:${dataType};base64,${Buffer.from(buffer).toString("base64")}`);
+  }
 }
 
+const mimeTypeMap: { [key: string]: string } = {
+  png: "image/png",
+  jpg: "image/jpeg",
+  webp: "image/webp",
+  gif: "image/gif",
+};
 export const mediaURLtoBase64 = async (url: string) => {
-  switch (url.split(".").pop()?.replace(/\?.*/, "")) {
-    case "png":
-      return URLtoBase64(url, "image/png");
-    case "jpg":
-      return URLtoBase64(url, "image/jpeg");
-    case "webp":
-      return URLtoBase64(url, "image/webp");
-    case "gif":
-      return URLtoBase64(url, "image/gif");
-    default:
-      return null;
+  const extension = url.split(".").pop()?.replace(/\?.*/, "");
+  if (!mimeTypeMap.hasOwnProperty(extension as string)) {
+    return null;
   }
+  const mimeType = extension ? mimeTypeMap[extension] : null;
+  return mimeType ? URLtoBase64(url, mimeType) : null;
 }
 
 export const prettyDuration = (duration: number) => {

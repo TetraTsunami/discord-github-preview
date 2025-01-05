@@ -67,8 +67,12 @@ const richPresenceSVG = async (activity: Activity, y: number): Promise<string> =
   // Get image URLs, then convert them to base64. URLs are stored separately to check that they exist before converting
   const largeImageURL = activity.assets?.largeImageURL({ size: 128, extension: "webp" });
   const smallImageURL = activity.assets?.smallImageURL({ size: 32, extension: "webp" });
-  const largeImage = largeImageURL && mediaURLtoBase64(largeImageURL);
-  const smallImage = smallImageURL && mediaURLtoBase64(smallImageURL);
+  let largeImage = largeImageURL && mediaURLtoBase64(largeImageURL);
+  let smallImage = smallImageURL && mediaURLtoBase64(smallImageURL);
+  if (!largeImage && smallImage) {
+    largeImage = smallImage;
+    smallImage = null;
+  }
   const timestamps = activity.timestamps;
   // 4 flavors: nothing (don't show), start only (hh:mm elapsed), end only (hh:mm remaining), both (hh:mm elapsed - hh:mm remaining)
   const timeElapsed = timestamps?.start ? prettyDuration(Date.now() - timestamps.start.getTime()) : "";
@@ -109,7 +113,10 @@ export const makeCard = async (user: UserProperties) => {
   1. Custom status (with custom emojis?)
   2. Current activity (game, can be up to 4 lines I think)
   */
-  const activities = user.presence?.activities || [];
+ const activities = user.presence?.activities || [];
+ if (process.env.NODE_ENV === "development") {
+   console.log(activities);
+ }
   // Height = 210 (user info, banner) + the height of all the activities, which varies based on the type of activity
   const userHeight = 220;
   const activityHeights = activities?.map(activity => isCustomStatus(activity) ? 80 : 

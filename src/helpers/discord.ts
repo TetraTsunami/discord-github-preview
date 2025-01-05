@@ -30,7 +30,7 @@ export async function fetchUserInfo(client: Client<true>, userID: string) {
     username: member.user.username,
     displayName: member.nickname || member.user.displayName,
     id: member.id,
-    avatarURL: pngURLtoBase64(avatarURL), // TODO: animated avatars, decorations and banners?
+    avatarURL: avatarURL ? pngURLtoBase64(avatarURL) : Promise.resolve(""), // TODO: animated avatars, decorations and banners?
     avatarDecorationURL: avatarDecorationURL ? pngURLtoBase64(avatarDecorationURL) : null,
     bannerURL: bannerURL ? jpgURLtoBase64(bannerURL) : null,
     accentColor: member.user.hexAccentColor || null,
@@ -46,7 +46,13 @@ export async function fetchAppIconURL(appID: string) {
     }
     return res.json();
   })
-  if (!appRPC) {
+  // The Xbox console connection doesn't have an icon on the backend,
+  // so we'll use a local image instead.
+  // This is okay because the app always converts image URLs to Base64
+  if (appRPC.name === "Xbox") {
+    return "./src/xboxball.png";
+  }
+  if (!appRPC || !appRPC.icon) {
     return null;
   }
   return `https://cdn.discordapp.com/app-icons/${appID}/${appRPC.icon}.webp`;
