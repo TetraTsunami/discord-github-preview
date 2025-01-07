@@ -43,5 +43,16 @@ export const prettyDuration = (duration: number) => {
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  return `${days ? `${days}:` : ""}${(hours % 24).toString().padStart(2, "0")}:${(minutes % 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
+  const set = [days, hours % 24, minutes % 60, seconds % 60]
+  const string = [];
+  for (let i = 0; i < set.length; i++) {
+    const unit = set[i];
+    if (!unit && !string.length && i < 2) continue;
+    if (!unit || string.length) {
+      string.push(unit.toString().padStart(2, "0"));
+    } else {
+      string.push(unit.toString());
+    }
+  }
+  return string.join(":");
 }
