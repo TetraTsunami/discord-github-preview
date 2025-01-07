@@ -19,7 +19,7 @@ Potential future features:
 ## Screenshots
 
 <p align="center">
-  <img width="400" src="https://github.com/user-attachments/assets/ff9e2dcd-f508-4cc3-8d52-8ecfe5ec53bb"></img>  
+  <img width="400" src="https://github.com/user-attachments/assets/564951aa-b1ef-43e5-bf9d-70f2d4f57a6c"></img>  
   <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
 
   A screenshot and actual instance of the program, side-by-side (in case I'm offline or doing something boring)
