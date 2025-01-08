@@ -36,7 +36,7 @@ export function prettyDuration(duration: number) {
   for (let i = 0; i < set.length; i++) {
     const unit = set[i];
     if (!unit && !string.length && i < 2) continue;
-    if (!unit || string.length) {
+    if (string.length) {
       string.push(unit.toString().padStart(2, "0"));
     } else {
       string.push(unit.toString());
