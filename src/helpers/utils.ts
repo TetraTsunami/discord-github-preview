@@ -7,31 +7,23 @@ const mimeTypeMap: { [key: string]: string } = {
   gif: "image/gif",
 };
 
-export async function mediaURLtoBase64(url: string) {
-  if (!url) {
-    return null;
-  }
-  const extension = url.split(".").pop()?.replace(/\?.*/, "");
-  if (!mimeTypeMap.hasOwnProperty(extension as string)) {
-    return null;
-  }
-  const mimeType = extension ? mimeTypeMap[extension] : null;
-  return mimeType ? URLtoBase64(url, mimeType) : null;
-}
-
-export async function URLtoBase64(url: string, dataType: string) {
-  let trueURL = url;
-  if (url.startsWith('.')) {
-    const buffer = await fs.readFile(url);
+/**
+ * Converts a URI to a Base64 string.
+ * If the URI is a local file, it will be read using `fs.readFile`, otherwise it will be fetched.
+ * @param uri The URI to convert.
+ */
+export async function URItoBase64(uri: string) {
+  if (!uri) {return null}
+  const ext = uri.split('.').pop();
+  if (uri.startsWith('.')) {
+    const buffer = await fs.readFile(uri);
+    const dataType = mimeTypeMap[ext as string] || "application/octet-stream";
     return `data:${dataType};base64,${buffer.toString('base64')}`;
-  } else if (url.startsWith('spotify:')) {
-    const parts = url.split(':'),
-     id = parts[parts.length - 1];
-    trueURL = `https://i.scdn.co/image/${id}`;
   }
-  return fetch(trueURL)
-    .then(res => res.arrayBuffer())
-    .then(buffer => `data:${dataType};base64,${Buffer.from(buffer).toString("base64")}`);
+  const res = fetch(uri);
+  const buffer = await res.then(res => res.arrayBuffer());
+  const contentType = res.then(res => res.headers.get("content-type"));
+  return `data:${contentType};base64,${Buffer.from(buffer).toString("base64")}`;
 }
 
 export function prettyDuration(duration: number) {

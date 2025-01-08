@@ -1,6 +1,6 @@
 import { fetchAppIconURL, UserProperties } from "./discord";
 import { Activity } from "discord.js";
-import { mediaURLtoBase64, prettyDuration } from "./utils";
+import { URItoBase64, prettyDuration } from "./utils";
 
 const colors = {
   background: "#111214",
@@ -42,7 +42,7 @@ const customStatus: ActivityDisplay = {
       <circle cx="250" cy="${bannerHeight + 5}" r="25" style="fill:${colors.secondaryBackground};"/>
       <rect x="200" y="${bannerHeight + 5}" width="${hasEmoji && !hasText ? 120 : 480}" height="90" rx="25" style="fill:${colors.secondaryBackground};"/>
     ${hasCustomEmoji ? 
-      `<image xlink:href="${await mediaURLtoBase64(emojiUrl as string)}" x="220" y="${bannerHeight + 15}" height="${emojiSize}" width="${emojiSize}" />` :
+      `<image xlink:href="${await URItoBase64(emojiUrl as string)}" x="220" y="${bannerHeight + 15}" height="${emojiSize}" width="${emojiSize}" />` :
     hasEmoji ?
       `<text style="fill: ${colors.text}; font-family:${fontFamily}; font-size:${emojiSize - 4}px;" x="220" y="${bannerHeight + emojiSize}">${emojiName}</text>`
     : ""}
@@ -62,8 +62,8 @@ const richPresence: ActivityDisplay = {
     // Get image URLs, then convert them to base64. URLs are stored separately to check that they exist before converting
     const largeImageURL = activity.assets?.largeImageURL({ size: 128, extension: "webp" });
     const smallImageURL = activity.assets?.smallImageURL({ size: 32, extension: "webp" });
-    let largeImage = largeImageURL && mediaURLtoBase64(largeImageURL);
-    let smallImage = smallImageURL && mediaURLtoBase64(smallImageURL);
+    let largeImage = largeImageURL && URItoBase64(largeImageURL);
+    let smallImage = smallImageURL && URItoBase64(smallImageURL);
     if (!largeImage && smallImage) {
       largeImage = smallImage;
       smallImage = null;
@@ -105,7 +105,7 @@ const genericActivity: ActivityDisplay = {
     // placeholder is "naturally" a size around 512x512 so we scale it down to be 120 pixels tall
     const placeholderImg = `<path transform='translate(55 ${y + 10}) scale(${120/512})' fill="${colors.text}" d="M384 32H64C28.654 32 0 60.654 0 96V416C0 451.346 28.654 480 64 480H384C419.346 480 448 451.346 448 416V96C448 60.654 419.346 32 384 32ZM224 400C206 400 192 386 192 368S206 336 224 336C242 336 256 350 256 368S242 400 224 400ZM294 258L248 286V288C248 301 237 312 224 312S200 301 200 288V272C200 264 204 256 212 251L269 217C276 213 280 206 280 198C280 186 270 176 258 176H206C194 176 184 186 184 198C184 211 173 222 160 222S136 211 136 198C136 159 167 128 206 128H258C297 128 328 159 328 198C328 222 315 245 294 258Z"/>`
     const iconURL = activity.applicationId ? await fetchAppIconURL(activity.applicationId) : null;
-    const embedIcon = iconURL ? `<image xlink:href="${await mediaURLtoBase64(iconURL)}" x="55" y="${y + 10}" height="120" width="120" clip-path="inset(0% round 15px)" />` : placeholderImg;
+    const embedIcon = iconURL ? `<image xlink:href="${await URItoBase64(iconURL)}" x="55" y="${y + 10}" height="120" width="120" clip-path="inset(0% round 15px)" />` : placeholderImg;
     const timeString = activity.timestamps?.start ? prettyDuration(Date.now() - activity.timestamps.start.getTime()) + " elapsed": "";
     const textY = y + 35;
     const textX = 208;
