@@ -1,5 +1,5 @@
 import { Client, Presence } from "discord.js";
-import { pngURLtoBase64, jpgURLtoBase64 } from "./utils";
+import { mediaURLtoBase64 } from "./utils";
 
 export interface UserProperties {
   username: string;
@@ -30,9 +30,9 @@ export async function fetchUserInfo(client: Client<true>, userID: string) {
     username: member.user.username,
     displayName: member.nickname || member.user.displayName,
     id: member.id,
-    avatarURL: avatarURL ? pngURLtoBase64(avatarURL) : Promise.resolve(""), // TODO: animated avatars, decorations and banners?
-    avatarDecorationURL: avatarDecorationURL ? pngURLtoBase64(avatarDecorationURL) : null,
-    bannerURL: bannerURL ? jpgURLtoBase64(bannerURL) : null,
+    avatarURL: avatarURL ? mediaURLtoBase64(avatarURL) as Promise<string> : Promise.resolve(""), // TODO: animated avatars, decorations and banners?
+    avatarDecorationURL: avatarDecorationURL ? mediaURLtoBase64(avatarDecorationURL) as Promise<string> : null,
+    bannerURL: bannerURL ? mediaURLtoBase64(bannerURL) as Promise<string> : null,
     accentColor: member.user.hexAccentColor || null,
     presence: member.presence,
   }

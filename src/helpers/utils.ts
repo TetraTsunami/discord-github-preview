@@ -1,35 +1,16 @@
 import fs from "fs/promises";
 
-export const pngURLtoBase64 = async (url: string) => {
-  return fetch(url)
-    .then(res => res.arrayBuffer())
-    .then(buffer => `data:image/png;base64,${Buffer.from(buffer).toString("base64")}`);
-};
-
-export const jpgURLtoBase64 = async (url: string) => {
-  return fetch(url)
-    .then(res => res.arrayBuffer())
-    .then(buffer => `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`);
-}
-
-export const URLtoBase64 = async (url: string, dataType: string) => {
-  if (url.startsWith('.')) {
-    const buffer = await fs.readFile(url);
-    return `data:${dataType};base64,${buffer.toString('base64')}`;
-  } else {
-    return fetch(url)
-      .then(res => res.arrayBuffer())
-      .then(buffer => `data:${dataType};base64,${Buffer.from(buffer).toString("base64")}`);
-  }
-}
-
 const mimeTypeMap: { [key: string]: string } = {
   png: "image/png",
   jpg: "image/jpeg",
   webp: "image/webp",
   gif: "image/gif",
 };
-export const mediaURLtoBase64 = async (url: string) => {
+
+export async function mediaURLtoBase64(url: string) {
+  if (!url) {
+    return null;
+  }
   const extension = url.split(".").pop()?.replace(/\?.*/, "");
   if (!mimeTypeMap.hasOwnProperty(extension as string)) {
     return null;
@@ -38,7 +19,22 @@ export const mediaURLtoBase64 = async (url: string) => {
   return mimeType ? URLtoBase64(url, mimeType) : null;
 }
 
-export const prettyDuration = (duration: number) => {
+export async function URLtoBase64(url: string, dataType: string) {
+  let trueURL = url;
+  if (url.startsWith('.')) {
+    const buffer = await fs.readFile(url);
+    return `data:${dataType};base64,${buffer.toString('base64')}`;
+  } else if (url.startsWith('spotify:')) {
+    const parts = url.split(':'),
+     id = parts[parts.length - 1];
+    trueURL = `https://i.scdn.co/image/${id}`;
+  }
+  return fetch(trueURL)
+    .then(res => res.arrayBuffer())
+    .then(buffer => `data:${dataType};base64,${Buffer.from(buffer).toString("base64")}`);
+}
+
+export function prettyDuration(duration: number) {
   const seconds = Math.floor(duration / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
