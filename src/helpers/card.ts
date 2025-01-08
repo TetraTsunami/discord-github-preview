@@ -82,7 +82,7 @@ const customStatus: ActivityDisplay = {
     return `<g>
       <circle cx="220" cy="${bannerHeight - 30}" r="15" style="fill:${colors.secondaryBackground};"/>
       <circle cx="250" cy="${bannerHeight + 5}" r="25" style="fill:${colors.secondaryBackground};"/>
-      <rect x="200" y="${bannerHeight + 5}" width="${hasEmoji && !hasText ? 120 : 480}" height="90" rx="25" style="fill:${colors.secondaryBackground};"/>
+      <rect x="200" y="${bannerHeight + 5}" width="${hasEmoji && !hasText ? 120 : 480}" height="90" rx="25px" style="fill:${colors.secondaryBackground};"/>
     ${hasCustomEmoji ?
         `<image xlink:href="${await URItoBase64(emojiUrl as string)}" x="220" y="${bannerHeight + 15}" height="${emojiSize}" width="${emojiSize}" />` :
         hasEmoji ?
@@ -98,7 +98,7 @@ const customStatus: ActivityDisplay = {
 }
 
 const richPresence: ActivityDisplay = {
-  height: 160,
+  height: 140,
   matches: (activity: Activity) => !!(activity.details || activity.state || activity.assets),
   render: async function (activity: Activity, y: number): Promise<string> {
     // Get image URLs, then convert them to base64. URLs are stored separately to check that they exist before converting
@@ -112,41 +112,42 @@ const richPresence: ActivityDisplay = {
     }
     const timestamps = activity.timestamps;
     const detailLines = [activity.details, activity.state].filter(Boolean);
-    const textY = y + 35;
-    const textX = 190;
+    const textY = y + 30;
+    const textX = 170;
+    const smallCenter = [140, 115]
     // Final SVG bits
     return `<g>
-      <rect x="20" y="${y}" width="660" height="160" rx="15" style="fill:${colors.secondaryBackground};"/>
+      <rect x="20" y="${y}" width="660" height="140" rx="15" style="fill:${colors.secondaryBackground};"/>
       <text style="fill:${colors.secondaryText};font-family:${fontFamily};font-size:24px;font-weight:600;" x="${textX}" y="${textY}">${sanitizeString(activity.name)}</text>
       ${detailLines.map((line, i) =>
       `<text style="fill: ${colors.secondaryText}; font-family:${fontFamily}; font-size: 20px;" x="${textX}" y="${textY + 30 + (i * 30)}">${sanitizeString(line || "")}</text>`).join("")
       }
       ${timestamps ? timestampSVG(textX, textY + (detailLines.length * 30), timestamps.start?.getTime(), timestamps.end?.getTime(), true) : ""}
       ${largeImage ?
-        `<image xlink:href="${await largeImage}" x="30" y="${y + 10}" height="140" width="140" clip-path="inset(0% round 5px)" />`
+        `<image xlink:href="${await largeImage}" x="30" y="${y + 10}" height="120" width="120" clip-path="inset(0% round 5px)" />`
         : ""}
       ${smallImage &&
-      `<rect x="126" y="${y + 107}" width="51" height="51" rx="100%" style="fill:${colors.secondaryBackground};"/>
-        <image xlink:href="${await smallImage}" x="130" y="${y + 111}" height="44" width="44" clip-path="circle()" />`
+        `<rect x="${smallCenter[0]-22}" y="${y + smallCenter[1]-22}" width="44" height="44" rx="100%" style="fill:${colors.secondaryBackground};"/>
+        <image xlink:href="${await smallImage}" x="${smallCenter[0]-19}" y="${y+smallCenter[1]-19}" height="38" width="38" clip-path="circle()" />`
       || ""}
     </g>`;
   }
 }
 
 const genericActivity: ActivityDisplay = {
-  height: 160,
+  height: 140,
   matches: () => true,
   render: async function (activity: Activity, y: number): Promise<string> {
     // placeholder is "naturally" a size around 512x512 so we scale it down to be 120 pixels tall
-    const placeholderPath = `<path transform='translate(30 ${y + 10}) scale(${140 / 512})' fill="${colors.text}" d="M384 32H64C28.654 32 0 60.654 0 96V416C0 451.346 28.654 480 64 480H384C419.346 480 448 451.346 448 416V96C448 60.654 419.346 32 384 32ZM224 400C206 400 192 386 192 368S206 336 224 336C242 336 256 350 256 368S242 400 224 400ZM294 258L248 286V288C248 301 237 312 224 312S200 301 200 288V272C200 264 204 256 212 251L269 217C276 213 280 206 280 198C280 186 270 176 258 176H206C194 176 184 186 184 198C184 211 173 222 160 222S136 211 136 198C136 159 167 128 206 128H258C297 128 328 159 328 198C328 222 315 245 294 258Z"/>`
+    const placeholderPath = `<path transform='translate(30 ${y + 10}) scale(${120 / 512})' fill="${colors.text}" d="M384 32H64C28.654 32 0 60.654 0 96V416C0 451.346 28.654 480 64 480H384C419.346 480 448 451.346 448 416V96C448 60.654 419.346 32 384 32ZM224 400C206 400 192 386 192 368S206 336 224 336C242 336 256 350 256 368S242 400 224 400ZM294 258L248 286V288C248 301 237 312 224 312S200 301 200 288V272C200 264 204 256 212 251L269 217C276 213 280 206 280 198C280 186 270 176 258 176H206C194 176 184 186 184 198C184 211 173 222 160 222S136 211 136 198C136 159 167 128 206 128H258C297 128 328 159 328 198C328 222 315 245 294 258Z"/>`
     const iconURL = activity.applicationId ? await fetchAppIconURL(activity.applicationId) : null;
-    const textY = y + 35;
-    const textX = 190;
+    const textY = y + 30;
+    const textX = 170;
     return `<g>
-      <rect x="20" y="${y}" width="660" height="160" rx="15" style="fill:${colors.secondaryBackground};"/>
+      <rect x="20" y="${y}" width="660" height="140" rx="15" style="fill:${colors.secondaryBackground};"/>
       <text style="fill:${colors.secondaryText};font-family:${fontFamily};font-size:24px;font-weight:600;" x="${textX}" y="${textY}">${activity.name}</text>
       ${iconURL ?
-        `<image xlink:href="${await URItoBase64(iconURL)}" x="30" y="${y + 10}" height="140" width="140" clip-path="inset(0% round 5px)" />`
+        `<image xlink:href="${await URItoBase64(iconURL)}" x="30" y="${y + 10}" height="120" width="120" clip-path="inset(0% round 5px)" />`
         : placeholderPath}
       ${timestampSVG(textX, textY, activity.timestamps?.start?.getTime())}
     </g>`;
@@ -182,13 +183,13 @@ export const makeCard = async (user: UserProperties) => {
 
 <!-- Banner & card background -->
 <g>
-  <rect x="0" y="0" width="700" height="${totalHeight}" rx="15" style="fill:${colors.background};"/>
+  <rect x="0" y="0" width="700" height="${totalHeight}" rx="35px" style="fill:${colors.background};"/>
   <clipPath id="background">
-    <rect x="0" y="0" width="700" height="${totalHeight}" rx="15" />
+    <rect x="0" y="0" width="700" height="${totalHeight}" rx="35px" />
   </clipPath>
   <g clip-path="url(#background)">
     <g>
-      <rect x="0" y="0" width="700" height="${bannerHeight - 2.5}" style="fill:${user.accentColor};"/>
+      <rect x="0" y="0" width="700" height="${bannerHeight - 2.5}" style="fill:${user.bannerURL ? colors.secondaryBackground : user.accentColor};"/>
       <clipPath id="banner">
         <rect x="0" y="0" width="700" height="${bannerHeight - 2.5}"/>
       </clipPath>
@@ -241,9 +242,9 @@ export const makeCard = async (user: UserProperties) => {
 <text style="fill: ${colors.secondaryText}; font-family:${fontFamily}; font-size: 22px; white-space: pre;" x="40" y="${bannerHeight + 93 + 40 + 30}">${user.username}</text>
 
 <!-- Discord Icon -->
-<path fill="${colors.text}" transform='translate(650 10) scale(0.3)' d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+<path fill="${colors.text}" transform='translate(645 15) scale(0.3)' opacity="0.5" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
 
 <!-- Activities, if any -->
 ${awaitedActivities.join("\n")}
-</svg>`;
+</svg>`.replace(/\n\s+/g, "");
 }

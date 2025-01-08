@@ -15,14 +15,14 @@ const mimeTypeMap: { [key: string]: string } = {
 export async function URItoBase64(uri: string) {
   if (!uri) {return null}
   const ext = uri.split('.').pop();
-  if (uri.startsWith('.')) {
+  if (uri.startsWith('./')) {
     const buffer = await fs.readFile(uri);
     const dataType = mimeTypeMap[ext as string] || "application/octet-stream";
     return `data:${dataType};base64,${buffer.toString('base64')}`;
   }
-  const res = fetch(uri);
-  const buffer = await res.then(res => res.arrayBuffer());
-  const contentType = res.then(res => res.headers.get("content-type"));
+  const res = await fetch(uri);
+  const buffer = await res.arrayBuffer();
+  const contentType = res.headers.get("content-type");
   return `data:${contentType};base64,${Buffer.from(buffer).toString("base64")}`;
 }
 

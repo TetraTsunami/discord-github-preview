@@ -11,6 +11,12 @@ export const discordSelf: RequestHandler = async (req, res, next) => {
 export const discordUser: RequestHandler = async (req, res, next) => {
   const client = await readyClient;
   const id = req.params.id;
+  const bannerOverride = req.query.banner as string;
+  // Banner override must be a valid URL, and also shouldn't point to a local file
+  if (bannerOverride && !bannerOverride.startsWith("http")) {
+    res.status(400).send("Invalid banner URL");
+    return;
+  }
   if (!validateId(id)) {
     res.status(400).send("Invalid ID");
     return;
@@ -20,6 +26,9 @@ export const discordUser: RequestHandler = async (req, res, next) => {
     if (!user) {
       res.status(404).send("User not found");
       return;
+    }
+    if (bannerOverride) {
+      user.bannerURL = Promise.resolve(bannerOverride);
     }
     const card = await makeCard(user);
     res.set('Content-Type', 'image/svg+xml')
