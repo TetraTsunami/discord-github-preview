@@ -2,6 +2,7 @@ import readyClient from "../bot";
 import { makeCard } from "../helpers/card";
 import { validateId, fetchUserInfo } from "../helpers/discord";
 import type { RequestHandler } from "express";
+import { URItoBase64 } from "../helpers/utils";
 
 export const discordSelf: RequestHandler = async (req, res, next) => {
   const client = await readyClient;
@@ -28,7 +29,7 @@ export const discordUser: RequestHandler = async (req, res, next) => {
       return;
     }
     if (bannerOverride) {
-      user.bannerURL = Promise.resolve(bannerOverride);
+      user.bannerURL = URItoBase64(bannerOverride);
     }
     const card = await makeCard(user);
     res.set('Content-Type', 'image/svg+xml')

@@ -5,9 +5,9 @@ export interface UserProperties {
   username: string;
   displayName: string;
   id: string;
-  avatarURL: Promise<string>;
-  avatarDecorationURL: Promise<string> | null;
-  bannerURL: Promise<string> | null;
+  avatarURL: Promise<string | null>;
+  avatarDecorationURL: Promise<string | null> | null;
+  bannerURL: Promise<string | null> | null;
   accentColor: string | null;
   presence: Presence | null;
 }
@@ -30,9 +30,9 @@ export async function fetchUserInfo(client: Client<true>, userID: string) {
     username: member.user.username,
     displayName: member.nickname || member.user.displayName,
     id: member.id,
-    avatarURL: avatarURL ? URItoBase64(avatarURL) as Promise<string> : Promise.resolve(""), // TODO: animated avatars, decorations and banners?
-    avatarDecorationURL: avatarDecorationURL ? URItoBase64(avatarDecorationURL) as Promise<string> : null,
-    bannerURL: bannerURL ? URItoBase64(bannerURL) as Promise<string> : null,
+    avatarURL: avatarURL ? URItoBase64(avatarURL) : Promise.resolve(""), // TODO: animated avatars, decorations and banners?
+    avatarDecorationURL: avatarDecorationURL ? URItoBase64(avatarDecorationURL) : null,
+    bannerURL: bannerURL ? URItoBase64(bannerURL) : null,
     accentColor: member.user.hexAccentColor || null,
     presence: member.presence,
   }

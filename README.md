@@ -19,22 +19,44 @@ Potential future features:
 ## Screenshots
 
 <p align="center">
-  <img width="400" src="https://github.com/user-attachments/assets/564951aa-b1ef-43e5-bf9d-70f2d4f57a6c"></img>  
+  <img width="400" src="https://github.com/user-attachments/assets/f4c9b564-e24e-4749-ac93-866562393cb7"></img>
   <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
 
-  A screenshot and actual instance of the program, side-by-side (in case I'm offline or doing something boring)
-  
+  *A screenshot and actual instance of the program, side-by-side (in case I'm offline or doing something boring)*
 </p>
 
 ## How do I get this set up?
 
-The simplest way is by using my hosted instance. 
+The simplest way is by using my hosted instance at https://dsc-readme.tsuni.dev. 
 
 1. You need to be in the same server as the bot for it to work, so you should [join my Discord server](https://discord.gg/W59fcbydeG)
-2. Right-click on the server icon and navigate to "Privacy settings". Make sure your "activity privacy" is set to ON for the server or else the bot won't be able to see your game activity, just your custom status.
-If you DON'T WANT the bot to display your game activity, then you can turn activity privacy OFF instead.
-3. Find your Discord User ID-- it's a number that looks like 214167454291722241. You can find this by turning on User Settings > Advanced > Developer Mode, then clicking on your profile picture in the
-bottom corner of the Discord client and pressing "Copy User ID"
-5. Paste `<img width="400" src="https://dsc-readme.tsuni.dev/api/user/<YOUR DISCORD USER ID>"></img>` into your GitHub README.md, replacing \<YOUR DISCORD USER ID\> with the ID you copied last step.
+2. Right-click on the server icon and navigate to "Privacy settings". Make sure your "activity privacy" is set to ON for the
+server or else the bot won't be able to see your game activity, just your custom status.
+   - If you don't want the bot to display your game activity, then you can turn activity privacy OFF instead.
+4. Find your Discord User ID-- it's a number that looks like 214167454291722241. There are two ways to find this:
+   - Mention yourself in a message, but put a backslash (`\`) before the mention. Then send the message and copy the numbers:
+![Discord_lYicGfP1qd](https://github.com/user-attachments/assets/12aacd86-fd3a-421d-a45e-e8b20c2c5c4a)
+   - Turn on User Settings > Advanced > Developer Mode, then click on your profile picture in the
+bottom corner of the Discord client and press "Copy User ID"
+6. Paste the following code:<br />
+`<img width="400" src="https://dsc-readme.tsuni.dev/api/user/<YOUR DISCORD USER ID>"></img>`<br />
+into your GitHub README.md, replacing \<YOUR DISCORD USER ID\> with the ID you copied last step.
 You can adjust the width here as well, but the images in the card won't look very good past 500px.
-6. If you want the profile to be centered, you can surround the `<img>` tags with `<p align="center">` and `</p>`
+## Customizations
+- Center the profile: surround the `<img>` tags with `<p align="center">` and `</p>`, like so:<br />
+```md
+<p align="center">
+  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
+</p>
+```
+<br />
+<p align="center">
+  <img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
+</p>
+
+- Change the banner: provide an image URL after your user ID, like so:<br />
+```md
+<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png"></img>
+```
+<br />
+<img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png"></img>

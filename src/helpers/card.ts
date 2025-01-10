@@ -175,7 +175,8 @@ export const makeCard = async (user: UserProperties) => {
     }
   }
   const totalHeight = currentHeight + 20;
-  const awaitedActivities = await Promise.all(activityPromises);
+  // Await all at once for images to load
+  const [avatar, banner, awaitedActivities] = await Promise.all([user.avatarURL, user.bannerURL, Promise.all(activityPromises)]);
 
   return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -189,13 +190,13 @@ export const makeCard = async (user: UserProperties) => {
   </clipPath>
   <g clip-path="url(#background)">
     <g>
-      <rect x="0" y="0" width="700" height="${bannerHeight - 2.5}" style="fill:${user.bannerURL ? colors.secondaryBackground : user.accentColor};"/>
+      <rect x="0" y="0" width="700" height="${bannerHeight - 2.5}" style="fill:${banner ? colors.secondaryBackground : user.accentColor};"/>
       <clipPath id="banner">
         <rect x="0" y="0" width="700" height="${bannerHeight - 2.5}"/>
       </clipPath>
       <g clip-path="url(#banner)">
-        ${user.bannerURL &&
-    `<image xlink:href="${await user.bannerURL}" height="${bannerHeight - 2.5}" width="700" preserveAspectRatio="xMidYMid slice" />`
+        ${banner &&
+    `<image xlink:href="${banner}" height="${bannerHeight - 2.5}" width="700" preserveAspectRatio="xMidYMid slice" />`
     }
       </g>
     </g>
@@ -209,7 +210,7 @@ export const makeCard = async (user: UserProperties) => {
     <circle cx="100" cy="${bannerHeight}" r="83"/>
   </clipPath>
   <g clip-path="url(#avatar)">
-    <image xlink:href="${await user.avatarURL}" x="17" y="${bannerHeight - 83}" height="166" width="166" />
+    <image xlink:href="${avatar}" x="17" y="${bannerHeight - 83}" height="166" width="166" />
   </g>
 </g>
 
