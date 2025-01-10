@@ -34,7 +34,7 @@ The simplest way is by using my hosted instance at https://dsc-readme.tsuni.dev.
 server or else the bot won't be able to see your game activity, just your custom status.
    - If you don't want the bot to display your game activity, then you can turn activity privacy OFF instead.
 4. Find your Discord User ID-- it's a number that looks like 214167454291722241. There are two ways to find this:
-   - Mention yourself in a message, but put a backslash (`\`) before the mention. Then send the message and copy the numbers:
+   - Mention yourself in a message, but put a backslash (`\`) before the mention. Then send the message and copy the numbers:<br />
 ![Discord_lYicGfP1qd](https://github.com/user-attachments/assets/12aacd86-fd3a-421d-a45e-e8b20c2c5c4a)
    - Turn on User Settings > Advanced > Developer Mode, then click on your profile picture in the
 bottom corner of the Discord client and press "Copy User ID"
