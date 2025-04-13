@@ -46,11 +46,11 @@ function timestampSVG(x: number, y: number, timeStart: number = 0, timeEnd: numb
   }
   // Progress bar
   const totalActivityLength = prettyDuration(timeEnd - timeStart);
-  const progress = (Date.now() - timeStart) / (timeEnd - timeStart);
+  const progress = Math.min((Date.now() - timeStart) / (timeEnd - timeStart), 1);
   const barWidth = 700 - x - 140;
   return `<g>
     <text style="fill: ${colors.secondaryText}; font-family:${fontFamily}; font-size: 20px;" x="${x}" y="${y + 30}">
-      ${timeElapsed}
+      ${Date.now() > timeEnd ? totalActivityLength : timeElapsed}
     </text>
     <rect x="${x + 50}" y="${y + 22}" width="${barWidth}" height="6" rx="3" style="fill:${colors.background};"/>
     <rect x="${x + 50}" y="${y + 22}" width="${barWidth * progress}" height="6" rx="3" style="fill:${colors.text};"/>
