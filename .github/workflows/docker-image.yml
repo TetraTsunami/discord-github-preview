@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Build and push Docker container
-      uses: KuhlTime/ghcr-action@v2
+    - name: Build and publish a Docker image for ${{ github.repository }}
+      uses: macbre/push-to-ghcr@v14
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}          
+        image_name: ${{ github.repository }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
