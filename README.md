@@ -8,12 +8,12 @@ Right now, it'll display:
 - Online, idle, DND, and offline states
 - Display name and username
 - Current activity and custom status
+- Animated profile decorations
+- Nitro profile colors
+- About Me
 
 Potential future features:
 - Color themes and other configuration
-- Nitro profile colors (get in touch with me if you can help test this!)
-- Animated profile decorations (see above)
-- About Me and connected accounts (does anyone actually want these?)
 
 
 ## Screenshots
@@ -24,6 +24,36 @@ Potential future features:
 
   *A screenshot and actual instance of the program, side-by-side (in case I'm offline or doing something boring)*
 </p>
+
+## Web Interface
+
+The project includes a sleek, Discord-themed web interface to help you create and customize your profile preview:
+
+<p align="center">
+  <img width="600" src="https://github.com/user-attachments/assets/your-image-id-here"></img>
+</p>
+
+### Features
+
+- **User-friendly Form**: Simply enter your Discord User ID to generate a preview
+- **Live Preview**: See how your profile will look in real-time
+- **Customization Options**:
+  - Add or edit an About Me section
+  - Override your banner with a custom image URL
+  - Hide avatar decorations if desired
+  - Choose between default colors, your profile's colors, or a custom color
+- **Copy URL**: Easily copy the generated URL for embedding in your GitHub README or website
+- **Responsive Design**: Works on desktop and mobile devices
+- **Keyboard Shortcuts**: Press Ctrl+Enter to quickly generate a preview
+
+### How to Use the UI
+
+1. Visit the web interface at https://dsc-readme.tsuni.dev
+2. Enter your Discord User ID in the input field
+3. Customize your profile preview with the available options
+4. Click "Generate Preview" to see the result
+5. Copy the generated URL using the "Copy URL" button
+6. Paste the URL into your GitHub README or website
 
 ## How do I get this set up?
 
@@ -42,7 +72,15 @@ bottom corner of the Discord client and press "Copy User ID"
 `<img width="400" src="https://dsc-readme.tsuni.dev/api/user/<YOUR DISCORD USER ID>"></img>`<br />
 into your GitHub README.md, replacing \<YOUR DISCORD USER ID\> with the ID you copied last step.
 You can adjust the width here as well, but the images in the card won't look very good past 500px.
+
 ## Customizations
+
+You can customize your profile preview in two ways:
+1. Using URL parameters (as shown below)
+2. Using the [Web Interface](#web-interface) for a more visual experience
+
+### URL Parameter Customizations
+
 - Center the profile: surround the `<img>` tags with `<p align="center">` and `</p>`, like so:<br />
 ```md
 <p align="center">
@@ -60,3 +98,39 @@ You can adjust the width here as well, but the images in the card won't look ver
 ```
 <br />
 <img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png"></img>
+
+- Add an About Me section: use the aboutMe parameter, like so:<br />
+```md
+<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?aboutMe=Hello%20world!%20I'm%20a%20developer%20who%20loves%20to%20code."></img>
+```
+<br />
+<img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?aboutMe=Hello%20world!%20I'm%20a%20developer%20who%20loves%20to%20code."></img>
+
+- Hide avatar decoration: use the hideDecoration parameter, like so:<br />
+```md
+<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideDecoration=true"></img>
+```
+
+- Use profile color: apply your Discord profile's color theme, like so:<br />
+```md
+<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?useProfileColor=true"></img>
+```
+
+- Use custom color: set a custom theme color with a hex value, like so:<br />
+```md
+<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?themeColor=%235865F2"></img>
+```
+
+## Self-Hosting
+
+If you prefer to host your own instance, follow these steps:
+
+1. Clone this repository
+2. Create a `.env` file with the following variables:
+   ```
+   DISCORD_TOKEN=your_discord_bot_token
+   TEST_USER_ID=your_discord_user_id
+   ```
+3. Install dependencies: `npm install`
+4. Run the server: `npm run dev`
+5. Visit `http://localhost:3000` to access the web interface
