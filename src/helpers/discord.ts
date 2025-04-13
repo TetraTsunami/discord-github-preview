@@ -7,8 +7,11 @@ export interface UserProperties {
   id: string;
   avatarURL: Promise<string | null>;
   avatarDecorationURL: Promise<string | null> | null;
+  isDecorationAnimated: boolean;
   bannerURL: Promise<string | null> | null;
   accentColor: string | null;
+  nitroProfileColor: string | null;
+  aboutMe: string | null;
   presence: Presence | null;
 }
 
@@ -22,18 +25,26 @@ export async function fetchUserInfo(client: Client<true>, userID: string) {
   if (!member) {
     return null;
   }
-  const avatarURL = member.displayAvatarURL({ size: 128, extension: "webp" }) || member.user.defaultAvatarURL
-  const avatarDecorationURL = member.user.avatarDecorationURL({ size: 512, extension: "webp" });
+  const avatarURL = member.displayAvatarURL({ size: 256, extension: "webp" }) || member.user.defaultAvatarURL
+  const avatarDecorationAsset = member.user.avatarDecorationData?.asset || null;
+  const isDecorationAnimated = avatarDecorationAsset?.includes('a_') || false;
+  const avatarDecorationURL = member.user.avatarDecorationURL({ 
+    size: 256, 
+    extension: isDecorationAnimated ? "gif" : "webp" 
+  });
   const bannerURL = member.user.bannerURL({ size: 512, extension: "webp" });
-
+  // unfortunately, bots are not allowed to fetch the profile endpoint, which contains the nitro profile color and bio
   const userProperties: UserProperties = {
     username: member.user.username,
     displayName: member.nickname || member.user.displayName,
     id: member.id,
-    avatarURL: avatarURL ? URItoBase64(avatarURL) : Promise.resolve(""), // TODO: animated avatars, decorations and banners?
+    avatarURL: avatarURL ? URItoBase64(avatarURL) : Promise.resolve(""),
     avatarDecorationURL: avatarDecorationURL ? URItoBase64(avatarDecorationURL) : null,
+    isDecorationAnimated,
     bannerURL: bannerURL ? URItoBase64(bannerURL) : null,
     accentColor: member.user.hexAccentColor || null,
+    nitroProfileColor: null,
+    aboutMe: null,
     presence: member.presence,
   }
   return userProperties;
