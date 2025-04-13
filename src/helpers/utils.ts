@@ -44,3 +44,20 @@ export function prettyDuration(duration: number) {
   }
   return string.join(":");
 }
+
+export function mixColors(color1: string, color2: string, strength: number): string {
+  const hexToRgb = (hex: string) => {
+    const bigint = parseInt(hex.slice(1), 16);
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+  };
+  const rgbToHex = (r: number, g: number, b: number) =>
+    `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+
+  const [r1, g1, b1] = hexToRgb(color1);
+  const [r2, g2, b2] = hexToRgb(color2);
+  const mixedR = Math.round((r1 * strength + r2 * (1 - strength)));
+  const mixedG = Math.round((g1 * strength + g2 * (1 - strength)));
+  const mixedB = Math.round((b1 * strength + b2 * (1 - strength)));
+
+  return rgbToHex(mixedR, mixedG, mixedB);
+}

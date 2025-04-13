@@ -10,8 +10,6 @@ export interface UserProperties {
   isDecorationAnimated: boolean;
   bannerURL: Promise<string | null> | null;
   accentColor: string | null;
-  nitroProfileColor: string | null;
-  aboutMe: string | null;
   presence: Presence | null;
 }
 
@@ -43,8 +41,6 @@ export async function fetchUserInfo(client: Client<true>, userID: string) {
     isDecorationAnimated,
     bannerURL: bannerURL ? URItoBase64(bannerURL) : null,
     accentColor: member.user.hexAccentColor || null,
-    nitroProfileColor: null,
-    aboutMe: null,
     presence: member.presence,
   }
   return userProperties;
