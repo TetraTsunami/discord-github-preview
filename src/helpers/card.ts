@@ -263,7 +263,7 @@ export const makeCard = async (user: UserProperties, options: CardOptions) => {
   } else if (options.themeType === "custom") {
     colors = {
       ...darkColors,
-      background: user.accentColor || darkColors.background,
+      ...options.customColors,
     }
   }
   const isNitroProfile = options.themeType === "nitroDark" || options.themeType === "nitroLight";

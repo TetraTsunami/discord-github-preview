@@ -8,13 +8,8 @@ Right now, it'll display:
 - Online, idle, DND, and offline states
 - Display name and username
 - Current activity and custom status
-- Animated profile decorations
-- Nitro profile colors
-- About Me
-
-Potential future features:
-- Color themes and other configuration
-
+- Avatar decorations (but they won't animate)
+- A custom About Me section and one of a number of color themes (Bots aren't allowed to see your bio or Nitro colors).
 
 ## Screenshots
 
@@ -75,45 +70,45 @@ You can customize your profile preview in two ways:
 
 ### URL Parameter Customizations
 
-- Center the profile: surround the `<img>` tags with `<p align="center">` and `</p>`, like so:<br />
-```md
-<p align="center">
-  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
-</p>
-```
-<br />
-<p align="center">
-  <img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
-</p>
+- **Center the profile:** surround the `<img>` tags with `<p align="center">` and `</p>`, like so:
+  ```md
+  <p align="center">
+    <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
+  </p>
+  ```
+  <p align="center">
+    <img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
+  </p>
 
-- Change the banner: provide an image URL after your user ID, like so:<br />
-```md
-<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png"></img>
-```
-<br />
-<img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png"></img>
+- **Change the banner:** provide an image URL after your user ID, for example:
+  ```md
+  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png"></img>
+  ```
 
-- Add an About Me section: use the aboutMe parameter, like so:<br />
-```md
-<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?aboutMe=Hello%20world!%20I'm%20a%20developer%20who%20loves%20to%20code."></img>
-```
-<br />
-<img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?aboutMe=Hello%20world!%20I'm%20a%20developer%20who%20loves%20to%20code."></img>
+- **Add an About Me section:** use the `aboutMe` parameter, for example:
+  ```md
+  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?aboutMe=Hello%20world!%20I'm%20a%20developer%20who%20loves%20to%20code."></img>
+  ```
 
-- Hide avatar decoration: use the hideDecoration parameter, like so:<br />
-```md
-<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideDecoration=true"></img>
-```
+- **Hide avatar decoration:** use the `hideDecoration` parameter:
+  ```md
+  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideDecoration=true"></img>
+  ```
 
-- Use profile color: apply your Discord profile's color theme, like so:<br />
-```md
-<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?useProfileColor=true"></img>
-```
-
-- Use custom color: set a custom theme color with a hex value, like so:<br />
-```md
-<img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?themeColor=%235865F2"></img>
-```
+- **Theme Customizations**
+  - Set the theme via the `theme` parameter, choosing one of: `dark`, `light`, `nitroDark`, `nitroLight`, or `custom`.
+  - For **Nitro themes** (`nitroDark` or `nitroLight`):
+    - Use the parameters `primaryColor` and `accentColor` with hex values provided **without** a `#`.  
+      Example:
+      ```md
+      <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?theme=nitroDark&primaryColor=5865F2&accentColor=99AAB5"></img>
+      ```
+  - For the **Custom theme**:
+    - Use the parameters `colorB1`, `colorB2`, `colorB3`, `colorT1`, and `colorT2` with hex values provided **without** a `#`.  
+      Example:
+      ```md
+      <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?theme=custom&colorB1=111214&colorB2=313338&colorB3=505059&colorT1=FFFFFF&colorT2=D2D6D8"></img>
+      ```
 
 ## Self-Hosting
 

@@ -265,23 +265,61 @@
         </div>
         
         <div class="section">
-          <span class="label">Theme Colors</span>
+          <span class="label">Theme</span>
           <div style="margin-bottom: 15px;">
             <div class="checkbox-container">
-              <input type="radio" id="defaultColor" name="colorOption" value="default" checked>
-              <label for="defaultColor">Default Colors</label>
+              <input type="radio" id="darkTheme" name="themeType" value="dark" checked>
+              <label for="darkTheme">Dark (default)</label>
             </div>
             <div class="checkbox-container">
-              <input type="radio" id="useProfileColor" name="colorOption" value="profile">
-              <label for="useProfileColor">Use Profile's Colors</label>
+              <input type="radio" id="lightTheme" name="themeType" value="light">
+              <label for="lightTheme">Light</label>
             </div>
             <div class="checkbox-container">
-              <input type="radio" id="customColor" name="colorOption" value="custom">
-              <label for="customColor">Custom Color</label>
+              <input type="radio" id="nitroDark" name="themeType" value="nitroDark">
+              <label for="nitroDark">Nitro Dark</label>
+            </div>
+            <div class="checkbox-container">
+              <input type="radio" id="nitroLight" name="themeType" value="nitroLight">
+              <label for="nitroLight">Nitro Light</label>
+            </div>
+            <div class="checkbox-container">
+              <input type="radio" id="customTheme" name="themeType" value="custom">
+              <label for="customTheme">Custom</label>
+            </div>
+          </div>
+          <div id="nitroColors" style="display: none; margin-bottom: 15px;">
+            <span class="label">Nitro Colors</span>
+            <div class="color-input-group">
+              <input type="color" id="primaryColorPicker" value="#5865F2">
+              <input type="text" id="primaryColorText" value="#5865F2" placeholder="#RRGGBB">
             </div>
             <div class="color-input-group">
-              <input type="color" id="themeColorPicker" value="#5865F2" disabled>
-              <input type="text" id="themeColorText" value="#5865F2" placeholder="#RRGGBB" disabled>
+              <input type="color" id="accentColorPicker" value="#99AAB5">
+              <input type="text" id="accentColorText" value="#99AAB5" placeholder="#RRGGBB">
+            </div>
+          </div>
+          <div id="customColors" style="display: none; margin-bottom: 15px;">
+            <span class="label">Custom Colors</span>
+            <div class="color-input-group">
+              <input type="color" id="colorB1Picker" value="#111214">
+              <input type="text" id="colorB1Text" value="#111214" placeholder="#RRGGBB">
+            </div>
+            <div class="color-input-group">
+              <input type="color" id="colorB2Picker" value="#313338">
+              <input type="text" id="colorB2Text" value="#313338" placeholder="#RRGGBB">
+            </div>
+            <div class="color-input-group">
+              <input type="color" id="colorB3Picker" value="#505059">
+              <input type="text" id="colorB3Text" value="#505059" placeholder="#RRGGBB">
+            </div>
+            <div class="color-input-group">
+              <input type="color" id="colorT1Picker" value="#ffffff">
+              <input type="text" id="colorT1Text" value="#ffffff" placeholder="#RRGGBB">
+            </div>
+            <div class="color-input-group">
+              <input type="color" id="colorT2Picker" value="#d2d6d8">
+              <input type="text" id="colorT2Text" value="#d2d6d8" placeholder="#RRGGBB">
             </div>
           </div>
         </div>
@@ -317,12 +355,24 @@
       const bannerUrlInput = document.getElementById('bannerUrl');
       const hideDecorationCheckbox = document.getElementById('hideDecoration');
       
-      // Color options
-      const defaultColorRadio = document.getElementById('defaultColor');
-      const useProfileColorRadio = document.getElementById('useProfileColor');
-      const customColorRadio = document.getElementById('customColor');
-      const themeColorPicker = document.getElementById('themeColorPicker');
-      const themeColorText = document.getElementById('themeColorText');
+      // Theme elements
+      const themeRadios = document.getElementsByName('themeType');
+      const nitroColorsDiv = document.getElementById('nitroColors');
+      const customColorsDiv = document.getElementById('customColors');
+      const primaryColorPicker = document.getElementById('primaryColorPicker');
+      const primaryColorText = document.getElementById('primaryColorText');
+      const accentColorPicker = document.getElementById('accentColorPicker');
+      const accentColorText = document.getElementById('accentColorText');
+      const colorB1Picker = document.getElementById('colorB1Picker');
+      const colorB1Text = document.getElementById('colorB1Text');
+      const colorB2Picker = document.getElementById('colorB2Picker');
+      const colorB2Text = document.getElementById('colorB2Text');
+      const colorB3Picker = document.getElementById('colorB3Picker');
+      const colorB3Text = document.getElementById('colorB3Text');
+      const colorT1Picker = document.getElementById('colorT1Picker');
+      const colorT1Text = document.getElementById('colorT1Text');
+      const colorT2Picker = document.getElementById('colorT2Picker');
+      const colorT2Text = document.getElementById('colorT2Text');
       
       const generateButton = document.getElementById('generatePreview');
       const previewImage = document.getElementById('previewImage');
@@ -345,36 +395,80 @@
       });
       
       // Theme color controls
-      defaultColorRadio.addEventListener('change', function() {
-        if (this.checked) {
-          themeColorPicker.disabled = true;
-          themeColorText.disabled = true;
+      function updateThemeControls() {
+        let selectedTheme;
+        themeRadios.forEach(radio => {
+          if (radio.checked) selectedTheme = radio.value;
+        });
+        if (selectedTheme === 'nitroDark' || selectedTheme === 'nitroLight') {
+          nitroColorsDiv.style.display = 'block';
+          customColorsDiv.style.display = 'none';
+        } else if (selectedTheme === 'custom') {
+          customColorsDiv.style.display = 'block';
+          nitroColorsDiv.style.display = 'none';
+        } else {
+          nitroColorsDiv.style.display = 'none';
+          customColorsDiv.style.display = 'none';
         }
-      });
+      }
+      themeRadios.forEach(radio => radio.addEventListener('change', updateThemeControls));
+      updateThemeControls();
       
-      useProfileColorRadio.addEventListener('change', function() {
-        if (this.checked) {
-          themeColorPicker.disabled = true;
-          themeColorText.disabled = true;
-        }
+      // Sync color pickers with text inputs
+      primaryColorPicker.addEventListener('input', function() {
+        primaryColorText.value = this.value.toUpperCase();
       });
-      
-      customColorRadio.addEventListener('change', function() {
-        if (this.checked) {
-          themeColorPicker.disabled = false;
-          themeColorText.disabled = false;
-          themeColorPicker.focus();
-        }
-      });
-      
-      // Sync color picker with text input
-      themeColorPicker.addEventListener('input', function() {
-        themeColorText.value = this.value.toUpperCase();
-      });
-      
-      themeColorText.addEventListener('input', function() {
+      primaryColorText.addEventListener('input', function() {
         if (this.value.match(/^#[0-9A-Fa-f]{6}$/i)) {
-          themeColorPicker.value = this.value;
+          primaryColorPicker.value = this.value;
+        }
+      });
+      accentColorPicker.addEventListener('input', function() {
+        accentColorText.value = this.value.toUpperCase();
+      });
+      accentColorText.addEventListener('input', function() {
+        if (this.value.match(/^#[0-9A-Fa-f]{6}$/i)) {
+          accentColorPicker.value = this.value;
+        }
+      });
+      colorB1Picker.addEventListener('input', function() {
+        colorB1Text.value = this.value.toUpperCase();
+      });
+      colorB1Text.addEventListener('input', function() {
+        if (this.value.match(/^#[0-9A-Fa-f]{6}$/i)) {
+          colorB1Picker.value = this.value;
+        }
+      });
+      colorB2Picker.addEventListener('input', function() {
+        colorB2Text.value = this.value.toUpperCase();
+      });
+      colorB2Text.addEventListener('input', function() {
+        if (this.value.match(/^#[0-9A-Fa-f]{6}$/i)) {
+          colorB2Picker.value = this.value;
+        }
+      });
+      colorB3Picker.addEventListener('input', function() {
+        colorB3Text.value = this.value.toUpperCase();
+      });
+      colorB3Text.addEventListener('input', function() {
+        if (this.value.match(/^#[0-9A-Fa-f]{6}$/i)) {
+          colorB3Picker.value = this.value;
+        }
+      });
+      colorT1Picker.addEventListener('input', function() {
+        colorT1Text.value = this.value.toUpperCase();
+      });
+      colorT1Text.addEventListener('input', function() {
+        if (this.value.match(/^#[0-9A-Fa-f]{6}$/i)) {
+          colorT1Picker.value = this.value;
+        }
+      });
+      colorT2Picker.addEventListener('input', function() {
+        colorT2Text.value = this.value.toUpperCase();
+      });
+      colorT2Text.addEventListener('input', function() {
+        if (this.value.match(/^#[0-9A-Fa-f]{6}$/i)) {
+          colorT2Picker.value = this.value;
         }
       });
       
@@ -406,11 +500,21 @@
           params.append('hideDecoration', 'true');
         }
         
-        // Add theme color parameters
-        if (useProfileColorRadio.checked) {
-          params.append('useProfileColor', 'true');
-        } else if (customColorRadio.checked) {
-          params.append('themeColor', themeColorText.value);
+        // Add theme parameters
+        let selectedTheme;
+        themeRadios.forEach(radio => {
+          if (radio.checked) selectedTheme = radio.value;
+        });
+        params.append('theme', selectedTheme);
+        if (selectedTheme === 'nitroDark' || selectedTheme === 'nitroLight') {
+          params.append('primaryColor', primaryColorText.value.replace(/^#/, ''));
+          params.append('accentColor', accentColorText.value.replace(/^#/, ''));
+        } else if (selectedTheme === 'custom') {
+          params.append('colorB1', colorB1Text.value.replace(/^#/, ''));
+          params.append('colorB2', colorB2Text.value.replace(/^#/, ''));
+          params.append('colorB3', colorB3Text.value.replace(/^#/, ''));
+          params.append('colorT1', colorT1Text.value.replace(/^#/, ''));
+          params.append('colorT2', colorT2Text.value.replace(/^#/, ''));
         }
         
         if (params.toString()) {

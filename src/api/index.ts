@@ -48,16 +48,16 @@ export const discordUser: RequestHandler = async (req, res, next) => {
     aboutMe: req.query.aboutMe as string | null,
     hideDecoration: req.query.hideDecoration === 'true',
     themeType: req.query.theme as "dark" | "light" | "custom" | "nitroDark" | "nitroLight" | undefined || "dark",
-    nitroColor1: req.query.primary as string | null || "#ecaff3",
-    nitroColor2: req.query.accent as string | null || "#44a17a",
+    nitroColor1: "#" + req.query.primaryColor as string | null || "ecaff3",
+    nitroColor2: "#" + req.query.accentColor as string | null || "44a17a",
   }
   if (options.themeType === "custom") {
     options.customColors = {
-      background: req.query.colorB1 as string | null || "#111214",
-      secondaryBackground: req.query.colorB2 as string | null || "#313338",
-      tertiaryBackground: req.query.colorB3 as string | null || "#505059",
-      text: req.query.colorT1 as string | null || "#fff",
-      secondaryText: req.query.colorT2 as string | null || "#d2d6d8",
+      background: "#" + req.query.colorB1 as string | null || "111214",
+      secondaryBackground: "#" + req.query.colorB2 as string | null || "313338",
+      tertiaryBackground: "#" + req.query.colorB3 as string | null || "505059",
+      text: "#" + req.query.colorT1 as string | null || "fff",
+      secondaryText: "#" + req.query.colorT2 as string | null || "d2d6d8",
     }
   }
   
