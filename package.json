@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "dependencies": {
     "apicache": "^1.6.3",
-    "discord.js": "^14.15.3",
+    "discord.js": "^14.18.0",
     "dotenv": "^16.0.1",
     "express": "^4.19.2"
   },

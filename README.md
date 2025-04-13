@@ -46,38 +46,32 @@ The project includes a sleek, Discord-themed web interface to help you create an
 - **Responsive Design**: Works on desktop and mobile devices
 - **Keyboard Shortcuts**: Press Ctrl+Enter to quickly generate a preview
 
-### How to Use the UI
+# How do I get this set up?
 
-1. Visit the web interface at https://dsc-readme.tsuni.dev
-2. Enter your Discord User ID in the input field
-3. Customize your profile preview with the available options
-4. Click "Generate Preview" to see the result
-5. Copy the generated URL using the "Copy URL" button
-6. Paste the URL into your GitHub README or website
-
-## How do I get this set up?
-
-The simplest way is by using my hosted instance at https://dsc-readme.tsuni.dev. 
+The simplest way is by using my hosted instance, but you can also host your own. Look at the [Self-Hosting](#self-hosting) section for more details.
 
 1. You need to be in the same server as the bot for it to work, so you should [join my Discord server](https://discord.gg/W59fcbydeG)
-2. Right-click on the server icon and navigate to "Privacy settings". Make sure your "activity privacy" is set to ON for the
-server or else the bot won't be able to see your game activity, just your custom status.
-   - If you don't want the bot to display your game activity, then you can turn activity privacy OFF instead.
-4. Find your Discord User ID-- it's a number that looks like 214167454291722241. There are two ways to find this:
-   - Mention yourself in a message, but put a backslash (`\`) before the mention. Then send the message and copy the numbers:<br />
+2. Right-click on the server icon and navigate to "Privacy settings". Make sure your "activity privacy" is set to ON for the server or else the bot won't be able to see your game activity, just your custom status.
+3. Visit the web interface at https://dsc-readme.tsuni.dev
+4. Enter your Discord User ID in the input field (see below for how to get this)
+5. Customize your profile preview with the available options
+6. Click "Generate Preview" to see the result
+7. Copy the generated URL using the "Copy URL" button
+8. Paste the URL into your GitHub README or website
+
+### How to get your Discord User ID
+
+It's a number that looks like 214167454291722241. There are two ways to find this:
+  - Mention yourself in a message, but put a backslash (`\`) before the mention. Then send the message and copy the numbers:<br />
 ![Discord_lYicGfP1qd](https://github.com/user-attachments/assets/12aacd86-fd3a-421d-a45e-e8b20c2c5c4a)
-   - Turn on User Settings > Advanced > Developer Mode, then click on your profile picture in the
-bottom corner of the Discord client and press "Copy User ID"
-6. Paste the following code:<br />
-`<img width="400" src="https://dsc-readme.tsuni.dev/api/user/<YOUR DISCORD USER ID>"></img>`<br />
-into your GitHub README.md, replacing \<YOUR DISCORD USER ID\> with the ID you copied last step.
-You can adjust the width here as well, but the images in the card won't look very good past 500px.
+  - Turn on User Settings > Advanced > Developer Mode, then click on your profile picture in the bottom corner of the Discord client and press "Copy User ID"
 
 ## Customizations
 
 You can customize your profile preview in two ways:
-1. Using URL parameters (as shown below)
-2. Using the [Web Interface](#web-interface) for a more visual experience
+
+1. Using the [Web Interface](#web-interface) for a more visual experience
+2. Using URL parameters (as shown below)
 
 ### URL Parameter Customizations
 
@@ -129,8 +123,13 @@ If you prefer to host your own instance, follow these steps:
 2. Create a `.env` file with the following variables:
    ```
    DISCORD_TOKEN=your_discord_bot_token
+   DISCORD_GUILD_ID=your_discord_guild_id
    TEST_USER_ID=your_discord_user_id
    ```
-3. Install dependencies: `npm install`
-4. Run the server: `npm run dev`
+3. Install dependencies: `pnpm install`
+4. Run the server: `pnpm run start`
 5. Visit `http://localhost:3000` to access the web interface
+
+You can substitute `pnpm` with `npm` or `yarn` if you prefer.
+
+There's also a Dockerfile and docker-compose.yml included, so you can run it in a container if you like. Follow steps 1-2, then run `docker-compose up` to start the server. You can access it at `http://localhost:3000`.

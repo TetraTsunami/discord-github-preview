@@ -179,7 +179,10 @@ function generateAboutMeSVG(aboutMe: string, startY: number): string {
 export const makeCard = async (user: UserProperties) => {
   const statusString = ((user.presence?.status && statusColors.hasOwnProperty(user.presence.status)) ? user.presence.status : "online") as keyof typeof statusColors;
   const activities = user.presence?.activities || [];
-  
+  if (process.env.NODE_ENV === "development") {
+    console.log("User", user);
+    console.log("Activities", activities);
+  }
   // Generate promises all at once so they can be awaited in parallel (activities use promises to load their images)
   const activityPromises: Promise<string>[] = []
   let currentHeight = bannerHeight + userHeaderHeight;
@@ -222,8 +225,7 @@ export const makeCard = async (user: UserProperties) => {
   // Apply Nitro profile color if available
   const bgColor = user.nitroProfileColor || colors.background;
   
-  // Prepare SVG content
-  let svgContent = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 700 ${totalHeight}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
 
@@ -260,21 +262,7 @@ export const makeCard = async (user: UserProperties) => {
 <!-- Avatar Decoration -->
 ${decoration ? `
 <g>
-  ${user.isDecorationAnimated ? `
-  <style>
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .animated-decoration {
-      animation: spin 8s linear infinite;
-      transform-origin: 100px ${bannerHeight}px;
-    }
-  </style>
-  <image class="animated-decoration" xlink:href="${decoration}" x="0" y="${bannerHeight - 100}" height="200" width="200" />
-  ` : `
   <image xlink:href="${decoration}" x="0" y="${bannerHeight - 100}" height="200" width="200" />
-  `}
 </g>
 ` : ''}
 
@@ -307,21 +295,12 @@ ${decoration ? `
 <text style="fill: ${colors.secondaryText}; font-family:${fontFamily}; font-size: 22px; white-space: pre;" x="40" y="${bannerHeight + 93 + 40 + 30}">${user.username}</text>
 
 <!-- Discord Icon -->
-<path fill="${colors.text}" transform='translate(645 15) scale(0.3)' d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>`;
+<path fill="${colors.text}" transform='translate(645 15) scale(0.3)' d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
 
-  // Add activities if any
-  if (awaitedActivities.length > 0) {
-    svgContent += `<!-- Activities -->\n${awaitedActivities.join("\n")}`;
-  }
+<!-- Activities, if any -->
+${awaitedActivities.join("\n")}
 
-  // Add About Me section if present
-  if (user.aboutMe) {
-    const aboutMeSection = generateAboutMeSVG(user.aboutMe, aboutMeY);
-    svgContent += `\n\n<!-- About Me section -->\n${aboutMeSection}`;
-  }
-
-  // Close the SVG
-  svgContent += `\n\n</svg>`;
-
-  return svgContent.replace(/\n\s+/g, "");
+<!-- About Me -->
+${user.aboutMe && generateAboutMeSVG(user.aboutMe, aboutMeY)}
+</svg>`.replace(/\n\s+/g, "");
 }

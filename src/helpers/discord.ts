@@ -25,70 +25,15 @@ export async function fetchUserInfo(client: Client<true>, userID: string) {
   if (!member) {
     return null;
   }
-  const avatarURL = member.displayAvatarURL({ size: 128, extension: "webp" }) || member.user.defaultAvatarURL
-  const avatarDecorationData = member.user.avatarDecoration;
-  const isDecorationAnimated = avatarDecorationData?.includes('a_') || false;
+  const avatarURL = member.displayAvatarURL({ size: 256, extension: "webp" }) || member.user.defaultAvatarURL
+  const avatarDecorationAsset = member.user.avatarDecorationData?.asset || null;
+  const isDecorationAnimated = avatarDecorationAsset?.includes('a_') || false;
   const avatarDecorationURL = member.user.avatarDecorationURL({ 
-    size: 512, 
+    size: 256, 
     extension: isDecorationAnimated ? "gif" : "webp" 
   });
   const bannerURL = member.user.bannerURL({ size: 512, extension: "webp" });
-  
-  // Fetch additional user profile data
-  let aboutMe = null;
-  let nitroProfileColor = null;
-  
-  try {
-    // Use Discord API to get user data
-    const userResponse = await fetch(`https://discord.com/api/v10/users/${userID}`, {
-      headers: {
-        'Authorization': `Bot ${process.env.DISCORD_TOKEN}`
-      }
-    });
-    
-    if (userResponse.ok) {
-      const userData = await userResponse.json();
-      
-      // Get the about me/bio from user data
-      aboutMe = userData.bio || null;
-      
-      // Get profile accent color if available
-      if (userData.accent_color) {
-        // Convert decimal color to hex
-        nitroProfileColor = `#${userData.accent_color.toString(16).padStart(6, '0')}`;
-      } else if (userData.banner_color) {
-        nitroProfileColor = userData.banner_color;
-      }
-      
-      // Try to get profile data if needed
-      try {
-        const profileResponse = await fetch(`https://discord.com/api/v10/users/${userID}/profile`, {
-          headers: {
-            'Authorization': `Bot ${process.env.DISCORD_TOKEN}`
-          }
-        });
-        
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          
-          // Use bio from profile data if we didn't get it from user data
-          if (!aboutMe && profileData.user?.bio) {
-            aboutMe = profileData.user.bio;
-          }
-          
-          // Try to get Nitro profile color if we didn't already get it
-          if (!nitroProfileColor && (profileData.user?.banner_color || profileData.premium_guild_since)) {
-            nitroProfileColor = profileData.user?.banner_color || member.user.hexAccentColor;
-          }
-        }
-      } catch (profileError) {
-        // Failed to get profile data, continue with what we have
-      }
-    }
-  } catch (error) {
-    // Failed to get user data, continue with what we have
-  }
-
+  // unfortunately, bots are not allowed to fetch the profile endpoint, which contains the nitro profile color and bio
   const userProperties: UserProperties = {
     username: member.user.username,
     displayName: member.nickname || member.user.displayName,
@@ -98,8 +43,8 @@ export async function fetchUserInfo(client: Client<true>, userID: string) {
     isDecorationAnimated,
     bannerURL: bannerURL ? URItoBase64(bannerURL) : null,
     accentColor: member.user.hexAccentColor || null,
-    nitroProfileColor,
-    aboutMe,
+    nitroProfileColor: null,
+    aboutMe: null,
     presence: member.presence,
   }
   return userProperties;
