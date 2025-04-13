@@ -30,7 +30,7 @@ Potential future features:
 The project includes a sleek, Discord-themed web interface to help you create and customize your profile preview:
 
 <p align="center">
-  <img width="600" src="https://github.com/user-attachments/assets/your-image-id-here"></img>
+  <img width="600" src="https://raw.githubusercontent.com/violetlaire/discord-github-preview/refs/heads/main/UI.png"></img>
 </p>
 
 ### Features
