@@ -1,0 +1,15 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build and push Docker container
+      uses: KuhlTime/ghcr-action@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}          
