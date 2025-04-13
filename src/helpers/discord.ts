@@ -30,7 +30,7 @@ export async function fetchUserInfo(client: Client<true>, userID: string) {
     size: 256, 
     extension: isDecorationAnimated ? "gif" : "webp" 
   });
-  const bannerURL = member.user.bannerURL({ size: 512, extension: "webp" });
+  const bannerURL = member.user.bannerURL({ size: 1024, extension: "webp" });
   // unfortunately, bots are not allowed to fetch the profile endpoint, which contains the nitro profile color and bio
   const userProperties: UserProperties = {
     username: member.user.username,
