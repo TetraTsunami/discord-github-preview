@@ -173,7 +173,7 @@ const spotifyActivity: ActivityDisplay = {
         durationValues.push(`${formatDuration(futureTime)} / ${totalDuration}`);
         if (futureTime > endTime - startTime) break; // allow one extra second so we can get to 100%
       }
-      const animatedDuration = animatedDurationSVG(durationValues, textX, textY + 90);
+      const animatedDuration = animatedDurationSVG(durationValues, textX, textY + 90, colors);
       progressBar = `
 				<rect x="${textX}" y="${textY + 65}" width="490" height="4" rx="2" style="fill:${colors.tertiaryBackground};"/>
 				<rect x="${textX}" y="${textY + 65}" width="${490 * progress}" height="4" rx="2" style="fill:${spotifyGreen};">

@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import { fontFamily } from "./card";
+import { ColorTheme } from "../types";
 
 const mimeTypeMap: { [key: string]: string } = {
   png: "image/png",
@@ -62,8 +63,8 @@ export function mixColors(color1: string, color2: string, strength: number): str
 
   return rgbToHex(mixedR, mixedG, mixedB);
 }
-// Add helper function for animated duration text
-export function animatedDurationSVG(strings: string[], x: number, y: number): string {
+
+export function animatedDurationSVG(strings: string[], x: number, y: number, colors: ColorTheme): string {
   // Each <text> element is rendered at the same position.
   // The first is visible, while the others have opacity 0.
   // At 1s intervals, the current text is set to opacity 0 and the next to opacity 1.
@@ -75,7 +76,7 @@ export function animatedDurationSVG(strings: string[], x: number, y: number): st
       animations = `<set attributeName="opacity" to="1" begin="${index}s" fill="freeze" />` +
         (index < strings.length - 1 ? `<set attributeName="opacity" to="0" begin="${index + 1}s" fill="freeze" />` : "");
     }
-    return `<text x="${x}" y="${y}" font-family="${fontFamily}" font-size="14" opacity="${index === 0 ? 1 : 0}">${str}${animations}</text>`;
+    return `<text x="${x}" y="${y}" font-family="${fontFamily}" font-size="14" fill="${colors.secondaryText}" opacity="${index === 0 ? 1 : 0}">${str}${animations}</text>`;
   }).join("");
 }export const truncate = (text: string, maxLen: number) => (text.length <= maxLen) ? text : text.substring(0, maxLen) + "...";
 export const formatDuration = (time: number) => {
