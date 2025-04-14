@@ -29,6 +29,7 @@ export const discordDebug: RequestHandler = async (req, res, next) => {
       nitroColor2: "#99AAB5", // Discord grey
       overrideBannerUrl: null,
       hideDecoration: false,
+      hideSpotify: false,
     }
     
     const card = await makeCard(user, options);
@@ -47,6 +48,7 @@ export const discordUser: RequestHandler = async (req, res, next) => {
     overrideBannerUrl: req.query.banner as string | null,
     aboutMe: req.query.aboutMe as string | null,
     hideDecoration: req.query.hideDecoration === 'true',
+    hideSpotify: req.query.hideSpotify === 'true',
     themeType: req.query.theme as "dark" | "light" | "custom" | "nitroDark" | "nitroLight" | undefined || "dark",
     nitroColor1: "#" + req.query.primaryColor as string | null || "ecaff3",
     nitroColor2: "#" + req.query.accentColor as string | null || "44a17a",

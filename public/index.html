@@ -262,6 +262,11 @@
             <input type="checkbox" id="hideDecoration">
             <label for="hideDecoration">Hide Avatar Decoration</label>
           </div>
+          
+          <div class="checkbox-container">
+            <input type="checkbox" id="hideSpotify">
+            <label for="hideSpotify">Hide Spotify Activity</label>
+          </div>
         </div>
         
         <div class="section">
@@ -354,6 +359,7 @@
       const overrideBannerCheckbox = document.getElementById('overrideBanner');
       const bannerUrlInput = document.getElementById('bannerUrl');
       const hideDecorationCheckbox = document.getElementById('hideDecoration');
+      const hideSpotifyCheckbox = document.getElementById('hideSpotify');
       
       // Theme elements
       const themeRadios = document.getElementsByName('themeType');
@@ -498,6 +504,10 @@
         
         if (hideDecorationCheckbox.checked) {
           params.append('hideDecoration', 'true');
+        }
+        
+        if (hideSpotifyCheckbox.checked) {
+          params.append('hideSpotify', 'true');
         }
         
         // Add theme parameters
