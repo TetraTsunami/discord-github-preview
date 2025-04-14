@@ -1,40 +1,12 @@
 import { fetchAppIconURL, UserProperties } from "./discord";
 import { Activity } from "discord.js";
-import { URItoBase64, mixColors, prettyDuration } from "./utils";
+import { URItoBase64, animatedDurationSVG, formatDuration, mixColors, prettyDuration, truncate } from "./utils";
+import { darkColors, lightColors, spotifyGreen, statusColors } from "./themes";
+import { ActivityDisplay, CardOptions, ColorTheme } from "../types";
+import { cardBackground } from "./cardBackground";
 
-interface ColorTheme {
-  background: string;
-  secondaryBackground: string;
-  tertiaryBackground: string;
-  text: string;
-  secondaryText: string;
-}
-
-const darkColors: ColorTheme = {
-  background: "#111214",
-  secondaryBackground: "#313338",
-  tertiaryBackground: "#505059",
-  text: "#fff",
-  secondaryText: "#d2d6d8",
-};
-
-const lightColors: ColorTheme = {
-  background: "#ffffff",
-  secondaryBackground: "#f2f2f3",
-  tertiaryBackground: "#e6e6e8",
-  text: "#000000",
-  secondaryText: "#606069",
-};
-
-const statusColors = {
-  online: "#43b581",
-  idle: "#faa61a",
-  dnd: "#f04747",
-  offline: "#747f8d"
-};
-
-const fontFamily = "Calibri,Tahoma,Segoe UI,sans-serif";
-const bannerHeight = 180;
+export const fontFamily = "Calibri,Tahoma,Segoe UI,sans-serif";
+export const bannerHeight = 180;
 const userHeaderHeight = 180;
 
 function sanitizeString(str: string) {
@@ -77,52 +49,6 @@ function timestampSVG(x: number, y: number, colors: ColorTheme, timeStart: numbe
       ${totalActivityLength}
     </text>
   </g>`
-}
-
-function cardBackground(colors: ColorTheme, nitro: boolean, totalHeight: number, banner: string | null, user: UserProperties) {
-  const bgColor = colors.background;
-  if (nitro) {
-    return `<g>
-<rect x="0" y="0" width="700" height="${totalHeight}" rx="35px" style="fill:url(#nitroGradient);"/>
-<g clip-path="url(#innerBackground)">
-  <rect x="5" y="5" width="690" height="${totalHeight - 10}" style="fill:url(#nitroOverlay);" />
-  <g>
-    <mask id="banner">
-      <rect x="0" y="0" width="700" height="${bannerHeight}" fill="white"/>
-      <circle cx="100" cy="${bannerHeight}" r="93" fill="black"/>
-    </mask>
-    <g mask="url(#banner)">
-      <rect x="5" y="5" width="690" height="${bannerHeight - 5}" style="fill:${banner ? colors.secondaryBackground : user.accentColor || bgColor};" />
-      ${banner ? `<image x="5" y="5" xlink:href="${banner}" height="${bannerHeight - 5}" width="690" preserveAspectRatio="xMidYMid slice" />` : ''}
-    </g>
-  </g>
-</g>
-</g>
-`
-  } else {
-    return `<g>
-<rect x="0" y="0" width="700" height="${totalHeight}" rx="35px" style="fill:${bgColor};"/>
-<g clip-path="url(#background)">
-  <g>
-    <mask id="banner">
-      <rect x="0" y="0" width="700" height="${bannerHeight}" fill="white"/>
-      <circle cx="100" cy="${bannerHeight}" r="93" fill="black"/>
-    </mask>
-    <g mask="url(#banner)">
-      <rect x="0" y="0" width="700" height="${bannerHeight}" style="fill:${banner ? colors.secondaryBackground : user.accentColor || bgColor};"/>
-      ${banner ? `<image xlink:href="${banner}" height="${bannerHeight}" width="700" preserveAspectRatio="xMidYMid slice" />` : ''}
-    </g>
-  </g>
-</g>
-</g>
-`
-  }
-}
-
-interface ActivityDisplay {
-  height: number;
-  matches: (activity: Activity) => boolean;
-  render: (activity: Activity, colors: ColorTheme, y: number) => Promise<string>;
 }
 
 const customStatus: ActivityDisplay = {
@@ -185,8 +111,8 @@ const richPresence: ActivityDisplay = {
         `<image xlink:href="${await largeImage}" x="30" y="${y + 10}" height="120" width="120" clip-path="inset(0% round 5px)" />`
         : ""}
       ${smallImage &&
-        `<rect x="${smallCenter[0]-22}" y="${y + smallCenter[1]-22}" width="44" height="44" rx="100%" style="fill:${colors.secondaryBackground};"/>
-        <image xlink:href="${await smallImage}" x="${smallCenter[0]-19}" y="${y+smallCenter[1]-19}" height="38" width="38" clip-path="circle()" />`
+      `<rect x="${smallCenter[0] - 22}" y="${y + smallCenter[1] - 22}" width="44" height="44" rx="100%" style="fill:${colors.secondaryBackground};"/>
+        <image xlink:href="${await smallImage}" x="${smallCenter[0] - 19}" y="${y + smallCenter[1] - 19}" height="38" width="38" clip-path="circle()" />`
       || ""}
     </g>`;
   }
@@ -220,94 +146,64 @@ const spotifyActivity: ActivityDisplay = {
     // Get album art
     const albumArtURL = activity.assets?.largeImageURL({ size: 256, extension: "webp" });
     const albumArt = albumArtURL && URItoBase64(albumArtURL);
-    
-    // Extract song details
-    const songName = activity.details || "Unknown Song";
-    const artistName = activity.state || "Unknown Artist";
-    const albumName = activity.assets?.largeText || "Unknown Album";
-    
-    // Truncate long text
-    const truncateText = (text: string, maxLength: number) => {
-      if (text.length <= maxLength) return text;
-      return text.substring(0, maxLength) + "...";
-    };
-    
-    const truncatedSongName = truncateText(songName, 25);
-    const truncatedArtistName = truncateText(artistName, 30);
-    const truncatedAlbumName = truncateText(albumName, 35);
-    
-    // Spotify colors
-    const spotifyGreen = "#1DB954";
-    
-    // Create a unique ID for this instance to avoid SVG ID conflicts
-    const uniqueId = `spotify-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    
+    const songName = truncate(activity.details || "Unknown Song", 25);
+    const artistName = truncate(activity.state || "Unknown Artist", 30);
+    const albumName = truncate(activity.assets?.largeText || "Unknown Album", 35);
+    const uniqueId = `spotify-${Date.now()}-${Math.floor(Math.random() * 1000)}`; // avoid SVG conflicts
     const textY = y + 35;
     const textX = 170;
-    
     // Calculate progress bar if timestamps are available
     const timestamps = activity.timestamps;
     const hasTimestamps = timestamps && timestamps.start && timestamps.end;
     let progressBar = "";
     let duration = "";
     let progress = 0;
-    
+
     if (hasTimestamps) {
       const startTime = timestamps.start?.getTime() || 0;
       const endTime = timestamps.end?.getTime() || 0;
       const currentTime = Date.now();
       progress = Math.min((currentTime - startTime) / (endTime - startTime), 1);
-      
-      // Format mm:ss
-      const formatTime = (time: number) => {
-        const minutes = Math.floor(time / 60000);
-        const seconds = Math.floor((time % 60000) / 1000);
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      };
-      
-      const currentPosition = formatTime(currentTime - startTime);
-      const totalDuration = formatTime(endTime - startTime);
-      
+      const currentPosition = formatDuration(currentTime - startTime);
+      const totalDuration = formatDuration(endTime - startTime);
       duration = `${currentPosition} / ${totalDuration}`;
-      
-      // Create progress bar
+      const durationValues: string[] = [];
+      for (let i = 0; i < 30; i++) {
+        const futureTime = currentTime - startTime + i * 1000;
+        durationValues.push(`${formatDuration(futureTime)} / ${totalDuration}`);
+        if (futureTime > endTime - startTime) break; // allow one extra second so we can get to 100%
+      }
+      const animatedDuration = animatedDurationSVG(durationValues, textX, textY + 90);
       progressBar = `
-        <rect x="${textX}" y="${textY + 65}" width="460" height="4" rx="2" style="fill:${colors.tertiaryBackground};"/>
-        <rect x="${textX}" y="${textY + 65}" width="${Math.max(460 * progress, 4)}" height="4" rx="2" style="fill:${spotifyGreen};"/>
-        <text style="fill: ${colors.secondaryText}; font-family:${fontFamily}; font-size: 14px;" x="${textX}" y="${textY + 90}">${duration}</text>
-      `;
+				<rect x="${textX}" y="${textY + 65}" width="490" height="4" rx="2" style="fill:${colors.tertiaryBackground};"/>
+				<rect x="${textX}" y="${textY + 65}" width="${490 * progress}" height="4" rx="2" style="fill:${spotifyGreen};">
+					<animate attributeName="width" from="${490 * progress}" to="490" begin="0s" dur="${Math.max((endTime - currentTime) / 1000, 0)}s" fill="freeze" />
+				</rect>
+				${animatedDuration}
+			`;
     }
-    
     return `<g>
       <rect x="20" y="${y}" width="660" height="140" rx="15" style="fill:${colors.secondaryBackground};"/>
-      
-      <!-- Album Art with Rounded Corners -->
-      ${albumArt ? 
+      ${albumArt ?
         `<clipPath id="albumArtClip-${uniqueId}">
            <rect x="30" y="${y + 10}" width="120" height="120" rx="6"/>
          </clipPath>
          <g clip-path="url(#albumArtClip-${uniqueId})">
            <image xlink:href="${await albumArt}" x="30" y="${y + 10}" height="120" width="120" />
-         </g>` : 
+         </g>` :
         `<rect x="30" y="${y + 10}" width="120" height="120" rx="6" style="fill:#333333;"/>`
       }
-      
-      <!-- Spotify Logo -->
-      <circle cx="42" cy="${y + 122}" r="12" fill="#000000"/>
-      <path d="M44.9 ${y + 118.4}c-1.6-1-4.3-1.1-5.8-0.6-0.3 0.1-0.5-0.1-0.6-0.3-0.1-0.3 0.1-0.5 0.3-0.6 1.8-0.5 4.7-0.4 6.6 0.7 0.2 0.1 0.3 0.4 0.2 0.6-0.1 0.2-0.4 0.3-0.7 0.2zm-0.3 1.5c-0.1 0.2-0.4 0.3-0.6 0.1-1.3-0.8-3.4-1.1-4.9-0.6-0.2 0-0.5 0-0.5-0.2-0.1-0.2 0-0.5 0.2-0.5 1.8-0.6 4.2-0.3 5.8 0.7 0.1 0.1 0.1 0.4 0 0.5zm-0.7 1.5c-0.1 0.1-0.3 0.2-0.5 0.1-1.2-0.7-2.6-0.9-4.3-0.5-0.2 0-0.3-0.1-0.4-0.2-0.1-0.2 0.1-0.4 0.2-0.4 1.9-0.4 3.6-0.2 4.9 0.6 0.3 0.1 0.3 0.3 0.1 0.4z" fill="${spotifyGreen}"/>
-      
-      <!-- Song Information -->
+      <circle cx="42" cy="${y + 122}" r="12" fill="${spotifyGreen}"/>
+      <path transform="translate(-54 ${y + 118.4}) scale(2.3)" d="M44.9 1c-1.6-1-4.3-1.1-5.8-0.6-0.3 0.1-0.5-0.1-0.6-0.3-0.1-0.3 0.1-0.5 0.3-0.6 1.8-0.5 4.7-0.4 6.6 0.7 0.2 0.1 0.3 0.4 0.2 0.6-0.1 0.2-0.4 0.3-0.7 0.2zm-0.3 1.5c-0.1 0.2-0.4 0.3-0.6 0.1-1.3-0.8-3.4-1.1-4.9-0.6-0.2 0-0.5 0-0.5-0.2-0.1-0.2 0-0.5 0.2-0.5 1.8-0.6 4.2-0.3 5.8 0.7 0.1 0.1 0.1 0.4 0 0.5zm-0.7 1.5c-0.1 0.1-0.3 0.2-0.5 0.1-1.2-0.7-2.6-0.9-4.3-0.5-0.2 0-0.3-0.1-0.4-0.2-0.1-0.2 0.1-0.4 0.2-0.4 1.9-0.4 3.6-0.2 4.9 0.6 0.3 0.1 0.3 0.3 0.1 0.4z" fill="${colors.background}"/>
       <text style="fill:${colors.text};font-family:${fontFamily};font-size:22px;font-weight:600;white-space:pre;" x="${textX}" y="${textY}">
-        ${sanitizeString(truncatedSongName)}
+        ${sanitizeString(songName)}
       </text>
       <text style="fill:${colors.secondaryText};font-family:${fontFamily};font-size:18px;white-space:pre;" x="${textX}" y="${textY + 30}">
-        by ${sanitizeString(truncatedArtistName)}
+        by ${sanitizeString(artistName)}
       </text>
       <text style="fill:${colors.secondaryText};font-family:${fontFamily};font-size:16px;white-space:pre;font-style:italic;" x="${textX}" y="${textY + 52}">
-        on ${sanitizeString(truncatedAlbumName)}
+        on ${sanitizeString(albumName)}
       </text>
-      
-      <!-- Progress Bar -->
       ${progressBar}
     </g>`;
   }
@@ -318,12 +214,12 @@ const displayables = [customStatus, spotifyActivity, richPresence, genericActivi
 // Helper function to generate about me section
 function generateAboutMeSVG(aboutMe: string, colors: ColorTheme, startY: number): string {
   if (!aboutMe) return '';
-  
+
   // Sanitize the text
   const sanitizedText = sanitizeString(aboutMe);
   // Estimate height based on text length (rough calculation)
   const estimatedHeight = Math.max(140, 100 + Math.ceil(sanitizedText.length / 40) * 24);
-  
+
   return `
   <g>
     <rect x="20" y="${startY}" width="660" height="${estimatedHeight}" rx="15" style="fill:${colors.secondaryBackground};"/>
@@ -334,17 +230,6 @@ function generateAboutMeSVG(aboutMe: string, colors: ColorTheme, startY: number)
       ${sanitizedText}</div>
     </foreignObject>
   </g>`;
-}
-
-export interface CardOptions {
-  overrideBannerUrl: string | null;
-  aboutMe: string | null;
-  hideDecoration: boolean;
-  hideSpotify: boolean;
-  themeType: "dark" | "light" | "custom" | "nitroDark" | "nitroLight";
-  nitroColor1: string;
-  nitroColor2: string;
-  customColors?: ColorTheme;
 }
 
 export const makeCard = async (user: UserProperties, options: CardOptions) => {
@@ -372,12 +257,12 @@ export const makeCard = async (user: UserProperties, options: CardOptions) => {
   // Generate promises all at once so they can be awaited in parallel (activities use promises to load their images)
   const activityPromises: Promise<string>[] = []
   let currentHeight = bannerHeight + userHeaderHeight;
-  
+
   // Filter out Spotify activities if hideSpotify is true
-  const filteredActivities = options.hideSpotify 
-    ? activities.filter(activity => activity.name !== "Spotify") 
+  const filteredActivities = options.hideSpotify
+    ? activities.filter(activity => activity.name !== "Spotify")
     : activities;
-    
+
   for (let i = 0; i < filteredActivities.length; i++) {
     const activity = filteredActivities[i];
     const display = displayables.find(displayable => displayable.matches(activity)) as ActivityDisplay;
@@ -403,8 +288,8 @@ export const makeCard = async (user: UserProperties, options: CardOptions) => {
   const totalHeight = currentHeight + 20; // Add padding at the botto
   // Await all at once for images to load
   const [avatar, banner, decoration, awaitedActivities] = await Promise.all([
-    user.avatarURL, 
-    user.bannerURL, 
+    user.avatarURL,
+    user.bannerURL,
     user.avatarDecorationURL,
     Promise.all(activityPromises)
   ]);

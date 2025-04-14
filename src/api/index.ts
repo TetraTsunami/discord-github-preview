@@ -1,5 +1,6 @@
 import readyClient from "../bot";
-import { CardOptions, makeCard } from "../helpers/card";
+import { makeCard } from "../helpers/card";
+import { CardOptions } from "../types";
 import { validateId, fetchUserInfo } from "../helpers/discord";
 import type { RequestHandler } from "express";
 import { URItoBase64 } from "../helpers/utils";

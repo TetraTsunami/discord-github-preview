@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import { fontFamily } from "./card";
 
 const mimeTypeMap: { [key: string]: string } = {
   png: "image/png",
@@ -61,3 +62,25 @@ export function mixColors(color1: string, color2: string, strength: number): str
 
   return rgbToHex(mixedR, mixedG, mixedB);
 }
+// Add helper function for animated duration text
+export function animatedDurationSVG(strings: string[], x: number, y: number): string {
+  // Each <text> element is rendered at the same position.
+  // The first is visible, while the others have opacity 0.
+  // At 1s intervals, the current text is set to opacity 0 and the next to opacity 1.
+  return strings.map((str, index) => {
+    let animations = "";
+    if (index === 0) {
+      animations = `<set attributeName="opacity" to="0" begin="1s" fill="freeze" />`;
+    } else {
+      animations = `<set attributeName="opacity" to="1" begin="${index}s" fill="freeze" />` +
+        (index < strings.length - 1 ? `<set attributeName="opacity" to="0" begin="${index + 1}s" fill="freeze" />` : "");
+    }
+    return `<text x="${x}" y="${y}" font-family="${fontFamily}" font-size="14" opacity="${index === 0 ? 1 : 0}">${str}${animations}</text>`;
+  }).join("");
+}export const truncate = (text: string, maxLen: number) => (text.length <= maxLen) ? text : text.substring(0, maxLen) + "...";
+export const formatDuration = (time: number) => {
+  const minutes = Math.floor(time / 60000);
+  const seconds = Math.floor((time % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};
+
