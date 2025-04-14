@@ -212,7 +212,108 @@ const genericActivity: ActivityDisplay = {
   }
 }
 
-const displayables = [customStatus, richPresence, genericActivity];
+// Spotify-specific activity handler with album art and progress bar
+const spotifyActivity: ActivityDisplay = {
+  height: 140,
+  matches: (activity: Activity) => activity.name === "Spotify",
+  render: async function (activity: Activity, colors: ColorTheme, y: number): Promise<string> {
+    // Get album art
+    const albumArtURL = activity.assets?.largeImageURL({ size: 256, extension: "webp" });
+    const albumArt = albumArtURL && URItoBase64(albumArtURL);
+    
+    // Extract song details
+    const songName = activity.details || "Unknown Song";
+    const artistName = activity.state || "Unknown Artist";
+    const albumName = activity.assets?.largeText || "Unknown Album";
+    
+    // Truncate long text
+    const truncateText = (text: string, maxLength: number) => {
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + "...";
+    };
+    
+    const truncatedSongName = truncateText(songName, 25);
+    const truncatedArtistName = truncateText(artistName, 30);
+    const truncatedAlbumName = truncateText(albumName, 35);
+    
+    // Spotify colors
+    const spotifyGreen = "#1DB954";
+    
+    // Create a unique ID for this instance to avoid SVG ID conflicts
+    const uniqueId = `spotify-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    
+    const textY = y + 35;
+    const textX = 170;
+    
+    // Calculate progress bar if timestamps are available
+    const timestamps = activity.timestamps;
+    const hasTimestamps = timestamps && timestamps.start && timestamps.end;
+    let progressBar = "";
+    let duration = "";
+    let progress = 0;
+    
+    if (hasTimestamps) {
+      const startTime = timestamps.start?.getTime() || 0;
+      const endTime = timestamps.end?.getTime() || 0;
+      const currentTime = Date.now();
+      progress = Math.min((currentTime - startTime) / (endTime - startTime), 1);
+      
+      // Format mm:ss
+      const formatTime = (time: number) => {
+        const minutes = Math.floor(time / 60000);
+        const seconds = Math.floor((time % 60000) / 1000);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      };
+      
+      const currentPosition = formatTime(currentTime - startTime);
+      const totalDuration = formatTime(endTime - startTime);
+      
+      duration = `${currentPosition} / ${totalDuration}`;
+      
+      // Create progress bar
+      progressBar = `
+        <rect x="${textX}" y="${textY + 65}" width="460" height="4" rx="2" style="fill:${colors.tertiaryBackground};"/>
+        <rect x="${textX}" y="${textY + 65}" width="${Math.max(460 * progress, 4)}" height="4" rx="2" style="fill:${spotifyGreen};"/>
+        <text style="fill: ${colors.secondaryText}; font-family:${fontFamily}; font-size: 14px;" x="${textX}" y="${textY + 90}">${duration}</text>
+      `;
+    }
+    
+    return `<g>
+      <rect x="20" y="${y}" width="660" height="140" rx="15" style="fill:${colors.secondaryBackground};"/>
+      
+      <!-- Album Art with Rounded Corners -->
+      ${albumArt ? 
+        `<clipPath id="albumArtClip-${uniqueId}">
+           <rect x="30" y="${y + 10}" width="120" height="120" rx="6"/>
+         </clipPath>
+         <g clip-path="url(#albumArtClip-${uniqueId})">
+           <image xlink:href="${await albumArt}" x="30" y="${y + 10}" height="120" width="120" />
+         </g>` : 
+        `<rect x="30" y="${y + 10}" width="120" height="120" rx="6" style="fill:#333333;"/>`
+      }
+      
+      <!-- Spotify Logo -->
+      <circle cx="42" cy="${y + 122}" r="12" fill="#000000"/>
+      <path d="M44.9 ${y + 118.4}c-1.6-1-4.3-1.1-5.8-0.6-0.3 0.1-0.5-0.1-0.6-0.3-0.1-0.3 0.1-0.5 0.3-0.6 1.8-0.5 4.7-0.4 6.6 0.7 0.2 0.1 0.3 0.4 0.2 0.6-0.1 0.2-0.4 0.3-0.7 0.2zm-0.3 1.5c-0.1 0.2-0.4 0.3-0.6 0.1-1.3-0.8-3.4-1.1-4.9-0.6-0.2 0-0.5 0-0.5-0.2-0.1-0.2 0-0.5 0.2-0.5 1.8-0.6 4.2-0.3 5.8 0.7 0.1 0.1 0.1 0.4 0 0.5zm-0.7 1.5c-0.1 0.1-0.3 0.2-0.5 0.1-1.2-0.7-2.6-0.9-4.3-0.5-0.2 0-0.3-0.1-0.4-0.2-0.1-0.2 0.1-0.4 0.2-0.4 1.9-0.4 3.6-0.2 4.9 0.6 0.3 0.1 0.3 0.3 0.1 0.4z" fill="${spotifyGreen}"/>
+      
+      <!-- Song Information -->
+      <text style="fill:${colors.text};font-family:${fontFamily};font-size:22px;font-weight:600;white-space:pre;" x="${textX}" y="${textY}">
+        ${sanitizeString(truncatedSongName)}
+      </text>
+      <text style="fill:${colors.secondaryText};font-family:${fontFamily};font-size:18px;white-space:pre;" x="${textX}" y="${textY + 30}">
+        by ${sanitizeString(truncatedArtistName)}
+      </text>
+      <text style="fill:${colors.secondaryText};font-family:${fontFamily};font-size:16px;white-space:pre;font-style:italic;" x="${textX}" y="${textY + 52}">
+        on ${sanitizeString(truncatedAlbumName)}
+      </text>
+      
+      <!-- Progress Bar -->
+      ${progressBar}
+    </g>`;
+  }
+}
+
+const displayables = [customStatus, spotifyActivity, richPresence, genericActivity];
 
 // Helper function to generate about me section
 function generateAboutMeSVG(aboutMe: string, colors: ColorTheme, startY: number): string {
