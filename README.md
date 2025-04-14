@@ -95,6 +95,11 @@ You can customize your profile preview in two ways:
   <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideDecoration=true"></img>
   ```
 
+- **Hide Spotify activity:** use the `hideSpotify` parameter to hide Spotify listening status:
+  ```md
+  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideSpotify=true"></img>
+  ```
+
 - **Theme Customizations**
   - Set the theme via the `theme` parameter, choosing one of: `dark`, `light`, `nitroDark`, `nitroLight`, or `custom`.
   - For **Nitro themes** (`nitroDark` or `nitroLight`):

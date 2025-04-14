@@ -340,6 +340,7 @@ export interface CardOptions {
   overrideBannerUrl: string | null;
   aboutMe: string | null;
   hideDecoration: boolean;
+  hideSpotify: boolean;
   themeType: "dark" | "light" | "custom" | "nitroDark" | "nitroLight";
   nitroColor1: string;
   nitroColor2: string;
@@ -371,17 +372,23 @@ export const makeCard = async (user: UserProperties, options: CardOptions) => {
   // Generate promises all at once so they can be awaited in parallel (activities use promises to load their images)
   const activityPromises: Promise<string>[] = []
   let currentHeight = bannerHeight + userHeaderHeight;
-  for (let i = 0; i < activities.length; i++) {
-    const activity = activities[i];
+  
+  // Filter out Spotify activities if hideSpotify is true
+  const filteredActivities = options.hideSpotify 
+    ? activities.filter(activity => activity.name !== "Spotify") 
+    : activities;
+    
+  for (let i = 0; i < filteredActivities.length; i++) {
+    const activity = filteredActivities[i];
     const display = displayables.find(displayable => displayable.matches(activity)) as ActivityDisplay;
     activityPromises.push(display.render(activity, colors, currentHeight));
     currentHeight += display.height;
-    if (i != activities.length - 1 && display.height) {
+    if (i != filteredActivities.length - 1 && display.height) {
       currentHeight += 10; // padding between activities
     }
   }
   // Add additional spacing after activities if any exist
-  if (activities.length > 0) {
+  if (filteredActivities.length > 0) {
     currentHeight += 20;
   }
   // Store section positions for later use
