@@ -328,7 +328,7 @@
           <div class="checkbox-container">
             <input type="checkbox" id="animatedToggle">
             <label for="animatedToggle">Animated (avatar/banner/decoration)
-              <span style="display:block; font-weight:400; color:var(--discord-text-muted); font-size:12px; margin-top:2px;">Note: GitHub will not display animated images. Use only on your personal website or other platforms that support animation. This significantly increases the filesize of the image.</span>
+              <span style="display:block; font-weight:400; color:var(--discord-text-muted); font-size:12px; margin-top:2px;">Note: GitHub will not display animated images. This significantly increases the filesize of the image.</span>
             </label>
           </div>
           <div class="checkbox-container">
@@ -352,11 +352,16 @@
         </div>
         
         <div class="section">
-          <span class="label">Preview URL</span>
+          <span class="label">Markdown URL (for GitHub)</span>
           <div class="result-box" id="previewUrl"></div>
         </div>
         
-        <button id="copyUrl">Copy URL</button>
+        <div class="section">
+          <span class="label">Raw URL</span>
+          <div class="result-box" id="rawUrl"></div>
+        </div>
+        
+        <button id="copyUrl">Copy Markdown URL</button>
       </div>
     </div>
   </div>
@@ -394,6 +399,7 @@
       const generateButton = document.getElementById('generatePreview');
       const previewImage = document.getElementById('previewImage');
       const previewUrlDisplay = document.getElementById('previewUrl');
+      const rawUrlDisplay = document.getElementById('rawUrl');
       const copyUrlButton = document.getElementById('copyUrl');
       
       // Enable/disable fields based on checkboxes
@@ -555,24 +561,47 @@
         // Update preview
         previewImage.style.opacity = '0.5';
         
-        // Create new image to handle load event
-        const newImage = new Image();
-        newImage.onload = function() {
-          previewImage.src = url;
-          previewImage.style.opacity = '1';
-          previewUrlDisplay.textContent = window.location.origin + url;
-          generateButton.textContent = 'Generate Preview';
-          generateButton.disabled = false;
-        };
-        
-        newImage.onerror = function() {
-          alert('Failed to generate image. Please check the User ID and try again.');
-          generateButton.textContent = 'Generate Preview';
-          generateButton.disabled = false;
-          previewImage.style.opacity = '1';
-        };
-        
-        newImage.src = url;
+        // First fetch the username
+        fetch(`/api/username/${userId}`)
+          .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch username');
+            return response.json();
+          })
+          .then(data => {
+            const username = data.username;
+            
+            // Create new image to handle load event
+            const newImage = new Image();
+            newImage.onload = function() {
+              previewImage.src = url;
+              previewImage.style.opacity = '1';
+              
+              // Format the URL as requested
+              const fullUrl = window.location.origin + url;
+              const markdownUrl = `[![${username}'s Discord status](${fullUrl})](https://github.com/TetraTsunami/discord-github-preview)`;
+              previewUrlDisplay.textContent = markdownUrl;
+              rawUrlDisplay.textContent = fullUrl;
+              
+              generateButton.textContent = 'Generate Preview';
+              generateButton.disabled = false;
+            };
+            
+            newImage.onerror = function() {
+              alert('Failed to generate image. Please check the User ID and try again.');
+              generateButton.textContent = 'Generate Preview';
+              generateButton.disabled = false;
+              previewImage.style.opacity = '1';
+            };
+            
+            newImage.src = url;
+          })
+          .catch(error => {
+            console.error('Error fetching username:', error);
+            alert('Failed to fetch username. Please check the User ID and try again.');
+            generateButton.textContent = 'Generate Preview';
+            generateButton.disabled = false;
+            previewImage.style.opacity = '1';
+          });
       });
       
       // Copy URL
@@ -585,7 +614,7 @@
             copyUrlButton.textContent = 'Copied!';
             copyUrlButton.classList.add('copy-success');
             setTimeout(() => {
-              copyUrlButton.textContent = 'Copy URL';
+              copyUrlButton.textContent = 'Copy Markdown URL';
               copyUrlButton.classList.remove('copy-success');
             }, 2000);
           })
@@ -595,8 +624,21 @@
           });
       });
       
-      // Initialize preview URL
-      previewUrlDisplay.textContent = window.location.origin + `/api/user/${userIdInput.value.trim()}`;
+      // Initialize preview URL with default format for initial ID
+      fetch(`/api/username/${userIdInput.value.trim()}`)
+        .then(response => response.json())
+        .then(data => {
+          const initialUrl = `/api/user/${userIdInput.value.trim()}`;
+          const fullUrl = window.location.origin + initialUrl;
+          previewUrlDisplay.textContent = `[![${data.username}'s Discord status](${fullUrl})](https://github.com/TetraTsunami/discord-github-preview)`;
+          rawUrlDisplay.textContent = fullUrl;
+        })
+        .catch(error => {
+          console.error('Error fetching initial username:', error);
+          const initialUrl = `/api/user/${userIdInput.value.trim()}`;
+          previewUrlDisplay.textContent = window.location.origin + initialUrl;
+          rawUrlDisplay.textContent = window.location.origin + initialUrl;
+        });
       
       // Add smooth transitions for image
       previewImage.style.transition = 'opacity 0.3s ease';

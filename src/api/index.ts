@@ -94,3 +94,25 @@ export const discordUser: RequestHandler = async (req, res, next) => {
     next(error);
   }
 }
+
+export const discordUsername: RequestHandler = async (req, res, next) => {
+  const client = await readyClient;
+  const id = req.params.id;
+  
+  if (!validateId(id)) {
+    res.status(400).send("Invalid ID");
+    return;
+  }
+  
+  try {
+    const user = await fetchUserInfo(client, id, false, 0);
+    if (!user) {
+      res.status(404).send("User not found");
+      return;
+    }
+    
+    res.status(200).json({ username: user.username });
+  } catch (error) {
+    next(error);
+  }
+}

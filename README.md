@@ -103,13 +103,14 @@ You can customize your profile preview in two ways:
 ![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideSpotify=true&width=400)
 ```
 - **Display animated avatar/banner/decoration:** use the `animate` parameter:
+  Before turning this on, please read the note in the [A note on animated avatars, banners, and decorations](#a-note-on-animated-avatars-banners-and-decorations) section. It might not do what you think it does!
 ```md
 ![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?animate=true&width=400)
 ```
-> [!NOTE]
-> Animated avatars, banners, and decorations will not animate on GitHub, due to restrictions on animated SVGs. However, they will work if you embed the image on your own website.
-> 
-> Additionally, embedding animated images significantly increases the filesize of the resulting SVG, resulting in slower load times and more work for my server. So really think about whether this needs to be turned on!
+- **Set the width:** use the `width` parameter to set the width of the image. The default is 512px, but you can set it to any value you like. This affects the resolution of embedded images, so thinner previews will be faster to load, and vice versa.
+```md
+![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?width=400)
+```
 - **Theme Customizations**
   - Set the theme via the `theme` parameter, choosing one of: `dark`, `light`, `nitroDark`, `nitroLight`, or `custom`.
   - For **Nitro themes** (`nitroDark` or `nitroLight`):
@@ -124,6 +125,16 @@ You can customize your profile preview in two ways:
       ```md
       ![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?theme=custom&colorB1=111214&colorB2=313338&colorB3=505059&colorT1=FFFFFF&colorT2=D2D6D8)
       ```
+
+## A note on animated avatars, banners, and decorations:
+
+Animated avatars, banners, and decorations **will not animate on GitHub**, most Markdown renderers, or when placed in an `<img>` tag. If you want to see the animation, you need to place the SVG in an `<object>` tag, like so:
+
+```html
+<object data="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https%3A%2F%2Ftsuni.dev%2Fimages%2Fsobanner.png&amp;theme=nitroLight&amp;primaryColor=8080FF&amp;accentColor=FF80C0" class="mx-auto my-2 max-w-full" width="500">Discord status</object>
+```
+
+Obviously, this will only work on platforms where you can write HTML, like your personal website. GitHub does not allow `<object>` tags in Markdown. Additionally, embedding animated images significantly increases the filesize of the resulting SVG, resulting in slower load times and more work for my server. So really think about whether this needs to be turned on!
 
 ## Self-Hosting
 
