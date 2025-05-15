@@ -11,7 +11,7 @@ export interface ColorTheme {
 export interface ActivityDisplay {
   height: number;
   matches: (activity: Activity) => boolean;
-  render: (activity: Activity, colors: ColorTheme, y: number) => Promise<string>;
+  render: (activity: Activity, colors: ColorTheme, y: number, width: number) => Promise<string>;
 }
 
 export interface CardOptions {

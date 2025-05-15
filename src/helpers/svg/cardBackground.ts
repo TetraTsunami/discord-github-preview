@@ -1,6 +1,6 @@
-import { ColorTheme } from "../types";
-import { bannerHeight } from "./card";
-import { UserProperties } from "./discord";
+import { ColorTheme } from "../../types";
+import { bannerHeight } from "../card";
+import { UserProperties } from "../discord";
 
 export function cardBackground(colors: ColorTheme, nitro: boolean, totalHeight: number, banner: string | null, user: UserProperties) {
   const bgColor = colors.background;
