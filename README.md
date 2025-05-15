@@ -15,7 +15,7 @@ Right now, it'll display:
 
 <p align="center">
   <img width="400" src="https://github.com/user-attachments/assets/f4c9b564-e24e-4749-ac93-866562393cb7"></img>
-  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
+  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https%3A%2F%2Ftsuni.dev%2Fimages%2Fsobanner.png&theme=nitroLight&primaryColor=8080FF&accentColor=FF80C0"></img>  
 
   *A screenshot and actual instance of the program, side-by-side (in case I'm offline or doing something boring)*
 </p>
@@ -73,46 +73,56 @@ You can customize your profile preview in two ways:
 - **Center the profile:** surround the `<img>` tags with `<p align="center">` and `</p>`, like so:
   ```md
   <p align="center">
-    <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
+    <img src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?width=400">
   </p>
   ```
+
   <p align="center">
-    <img width="300" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241"></img>  
+    <img src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?width=300">
   </p>
 
 - **Change the banner:** provide an image URL after your user ID, for example:
-  ```md
-  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png"></img>
-  ```
+```md
+![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png)
+```
+
+![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?banner=https://tsuni.dev/images/sobanner.png)
 
 - **Add an About Me section:** use the `aboutMe` parameter, for example:
-  ```md
-  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?aboutMe=Hello%20world!%20I'm%20a%20developer%20who%20loves%20to%20code."></img>
-  ```
+```md
+![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?aboutMe=Hello%20world!%20I'm%20a%20developer%20who%20loves%20to%20code.)
+```
 
 - **Hide avatar decoration:** use the `hideDecoration` parameter:
-  ```md
-  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideDecoration=true"></img>
-  ```
+```md
+![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideDecoration=true&width=400)
+```
 
 - **Hide Spotify activity:** use the `hideSpotify` parameter to hide Spotify listening status:
-  ```md
-  <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideSpotify=true"></img>
-  ```
-
+```md
+![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?hideSpotify=true&width=400)
+```
+- **Display animated avatar/banner/decoration:** use the `animate` parameter:
+```md
+![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?animate=true&width=400)
+```
+> [!NOTE]
+> Animated avatars, banners, and decorations will not animate on GitHub, due to restrictions on animated SVGs. However, they will work if you embed the image on your own website.
+> 
+> Additionally, embedding animated images significantly increases the filesize of the resulting SVG, resulting in slower load times and more work for my server. So really think about whether this needs to be turned on!
 - **Theme Customizations**
   - Set the theme via the `theme` parameter, choosing one of: `dark`, `light`, `nitroDark`, `nitroLight`, or `custom`.
   - For **Nitro themes** (`nitroDark` or `nitroLight`):
     - Use the parameters `primaryColor` and `accentColor` with hex values provided **without** a `#`.  
       Example:
       ```md
-      <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?theme=nitroDark&primaryColor=5865F2&accentColor=99AAB5"></img>
+      ![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?theme=nitroDark&primaryColor=5865F2&accentColor=99AAB5&width=400)
       ```
   - For the **Custom theme**:
     - Use the parameters `colorB1`, `colorB2`, `colorB3`, `colorT1`, and `colorT2` with hex values provided **without** a `#`.  
       Example:
       ```md
-      <img width="400" src="https://dsc-readme.tsuni.dev/api/user/214167454291722241?theme=custom&colorB1=111214&colorB2=313338&colorB3=505059&colorT1=FFFFFF&colorT2=D2D6D8"></img>
+      ![](https://dsc-readme.tsuni.dev/api/user/214167454291722241?theme=custom&colorB1=111214&colorB2=313338&colorB3=505059&colorT1=FFFFFF&colorT2=D2D6D8)
       ```
 
 ## Self-Hosting
@@ -124,8 +134,9 @@ If you prefer to host your own instance, follow these steps:
    ```
    DISCORD_TOKEN=your_discord_bot_token
    DISCORD_GUILD_ID=your_discord_guild_id
-   TEST_USER_ID=your_discord_user_id
    ```
+   - `DISCORD_TOKEN`: Your Discord bot token (you can create a bot at the [Discord Developer Portal](https://discord.com/developers/applications))
+   - `DISCORD_GUILD_ID`: The ID of the server where the bot will be used (you can find this by right-clicking the server icon in Discord and selecting "Copy Server ID")
 3. Install dependencies: `pnpm install`
 4. Run the server: `pnpm run start`
 5. Visit `http://localhost:3000` to access the web interface

@@ -24,6 +24,8 @@ export const discordDebug: RequestHandler = async (req, res, next) => {
     
     // Force add the About Me for testing
     const options: CardOptions = {
+      animate: false,
+      width: 500,
       aboutMe: "This is a test about me section",
       themeType: "nitroDark",
       nitroColor1: "#7289DA", // Discord blue
@@ -46,6 +48,8 @@ export const discordUser: RequestHandler = async (req, res, next) => {
   const client = await readyClient;
   const id = req.params.id;
   const options: CardOptions = {
+    width: parseInt(req.query.width as string) || 500,
+    animate: req.query.animate === 'true',
     overrideBannerUrl: req.query.banner as string | null,
     aboutMe: req.query.aboutMe as string | null,
     hideDecoration: req.query.hideDecoration === 'true',
@@ -74,7 +78,7 @@ export const discordUser: RequestHandler = async (req, res, next) => {
     return;
   }
   try {
-    const user = await fetchUserInfo(client, id);
+    const user = await fetchUserInfo(client, id, options.animate, options.width);
     if (!user) {
       res.status(404).send("User not found");
       return;

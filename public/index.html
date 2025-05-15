@@ -234,7 +234,7 @@
       <div class="column">
         <div class="section">
           <span class="label">User ID</span>
-          <input type="text" id="userId" placeholder="Discord User ID" value="994135527815118898">
+          <input type="text" id="userId" placeholder="Discord User ID" value="879917497959219250">
         </div>
         
         <div class="section">
@@ -245,16 +245,6 @@
           
           <span class="label">About Me</span>
           <textarea id="aboutMe" placeholder="About me content..." disabled></textarea>
-        </div>
-        
-        <div class="section">
-          <div class="checkbox-container">
-            <input type="checkbox" id="overrideBanner">
-            <label for="overrideBanner">Override Banner</label>
-          </div>
-          
-          <span class="label">Banner URL</span>
-          <input type="text" id="bannerUrl" placeholder="https://example.com/banner.png" disabled>
         </div>
         
         <div class="section">
@@ -328,6 +318,27 @@
             </div>
           </div>
         </div>
+
+        <div class="section">
+          <span class="label">Image Options</span>
+          <div style="margin-bottom: 12px;">
+            <label class="label" for="widthInput">Width (px)</label>
+            <input type="number" id="widthInput" min="128" max="2048" step="1" value="512" placeholder="Width in pixels">
+          </div>
+          <div class="checkbox-container">
+            <input type="checkbox" id="animatedToggle">
+            <label for="animatedToggle">Animated (avatar/banner/decoration)
+              <span style="display:block; font-weight:400; color:var(--discord-text-muted); font-size:12px; margin-top:2px;">Note: GitHub will not display animated images. Use only on your personal website or other platforms that support animation. This significantly increases the filesize of the image.</span>
+            </label>
+          </div>
+          <div class="checkbox-container">
+            <input type="checkbox" id="overrideBanner">
+            <label for="overrideBanner">Override Banner</label>
+          </div>
+          
+          <span class="label">Banner URL</span>
+          <input type="text" id="bannerUrl" placeholder="https://example.com/banner.png" disabled>
+        </div>
         
         <button id="generatePreview">Generate Preview</button>
       </div>
@@ -336,7 +347,7 @@
         <div class="section">
           <span class="label">Preview</span>
           <div class="preview">
-            <img id="previewImage" src="/api/user/994135527815118898" alt="Discord Profile Preview">
+            <img id="previewImage" src="/api/user/879917497959219250" alt="Discord Profile Preview">
           </div>
         </div>
         
@@ -525,6 +536,16 @@
           params.append('colorB3', colorB3Text.value.replace(/^#/, ''));
           params.append('colorT1', colorT1Text.value.replace(/^#/, ''));
           params.append('colorT2', colorT2Text.value.replace(/^#/, ''));
+        }
+
+        // Add width and animated params
+        const widthInput = document.getElementById('widthInput');
+        const animatedToggle = document.getElementById('animatedToggle');
+        if (widthInput && widthInput.value) {
+          params.append('width', widthInput.value);
+        }
+        if (animatedToggle && animatedToggle.checked) {
+          params.append('animate', 'true');
         }
         
         if (params.toString()) {

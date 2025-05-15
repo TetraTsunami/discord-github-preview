@@ -17,20 +17,36 @@ export const validateId = (id: string) => {
   return id.match(/^[0-9]{17,19}$/);
 }
 
-export async function fetchUserInfo(client: Client<true>, userID: string) {
+export function roundImageSize(size: number): 64 | 128 | 256 | 512 | 1024 {
+  const allowedSizes = [64, 128, 256, 512, 1024, 2048];
+  for (const s of allowedSizes) {
+    if (size <= s) return s as 64 | 128 | 256 | 512 | 1024;
+  }
+  return 1024;
+}
+
+// discord.js doesn't support building non-default (animated and normal size) avatar decoration URLs
+function getAvatarDecorationURL(client: Client<true>, asset: string, size: number, animated: boolean = true): string {
+  const out = new URL(`https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png`);
+  if (size && !animated) {
+    out.searchParams.set("size", size.toString());
+    out.searchParams.set("passthrough", "false");
+  }
+  return out.toString();
+}
+
+// Fetches user info. Uses animation/width values to determine which images to use for avatar, decoration, and banner.
+export async function fetchUserInfo(client: Client<true>, userID: string, animated = false, width = 500): Promise<UserProperties | null> {
   const guildID = process.env.DISCORD_GUILD_ID as string;
   const member = await client.guilds.cache.get(guildID)?.members.fetch({ user: userID, force: true });
   if (!member) {
     return null;
   }
-  const avatarURL = member.displayAvatarURL({ size: 256, extension: "webp" }) || member.user.defaultAvatarURL
+  const avatarURL = member.displayAvatarURL({ size: roundImageSize(width / 4), extension: "webp", forceStatic: !animated }) || member.user.defaultAvatarURL
   const avatarDecorationAsset = member.user.avatarDecorationData?.asset || null;
-  const isDecorationAnimated = avatarDecorationAsset?.includes('a_') || false;
-  const avatarDecorationURL = member.user.avatarDecorationURL({ 
-    size: 256, 
-    extension: isDecorationAnimated ? "gif" : "webp" 
-  });
-  const bannerURL = member.user.bannerURL({ size: 1024, extension: "webp" });
+  const isDecorationAnimated = (animated && avatarDecorationAsset?.includes('a_')) || false;
+  const avatarDecorationURL = member.user.avatarDecorationData ? getAvatarDecorationURL(client, member.user.avatarDecorationData.asset, roundImageSize(width / 4), animated) : null;
+  const bannerURL = member.user.bannerURL({ size: roundImageSize(width), extension: "webp", forceStatic: !animated }) || null;
   // unfortunately, bots are not allowed to fetch the profile endpoint, which contains the nitro profile color and bio
   const userProperties: UserProperties = {
     username: member.user.username,

@@ -15,6 +15,8 @@ export interface ActivityDisplay {
 }
 
 export interface CardOptions {
+  width: number;
+  animate: boolean;
   overrideBannerUrl: string | null;
   aboutMe: string | null;
   hideDecoration: boolean;
