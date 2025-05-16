@@ -22,7 +22,7 @@ export const customStatus: ActivityDisplay = {
     ${hasCustomEmoji ?
         `<image xlink:href="${await URItoBase64(emojiUrl as string)}" x="220" y="${bannerHeight + 15}" height="${emojiSize}" width="${emojiSize}" />` :
         hasEmoji ?
-          `<text style="fill: ${colors.text}; font-family:${fontFamily}; font-size:${emojiSize - 4}px;" x="220" y="${bannerHeight + emojiSize}">${emojiName}</text>`
+          `<text style="fill: ${colors.text}; font-family:${fontFamily}; font-size:${emojiSize - 4}px;" x="220" y="${bannerHeight + emojiSize + 10}">${emojiName}</text>`
           : ""}
     ${hasText ? `<foreignObject x="${xOffset}" y="${bannerHeight + 20}" width="${700 - xOffset - 40}" height="60">
       <p xmlns="http://www.w3.org/1999/xhtml" 
